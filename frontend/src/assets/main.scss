@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    display: block;
+    margin: 0;
+    // background-color: #a7bcff;
+    background: #5433FF;
+    /* fallback for old browsers */
+    background: -webkit-linear-gradient(to left, #A5FECB, #20BDFF, #5433FF);
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to left, #A5FECB, #20BDFF, #5433FF);
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+/* Works on Firefox */
+* {
+    scrollbar-width: 10px;
+    scrollbar-color: #24004f transparent;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #24004f;
+    border-radius: 20px;
+    border: none;
+}
+
+@font-face {
+    font-family: HyliaSerif;
+    src: url(HyliaSerifBeta-Regular.otf) format('opentype');
+}
