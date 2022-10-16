@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import { uploadFile, deleteFile } from '../utils/fileUploadUtil.js';
-import generateToken from '../utils/tokenUtil.js';
+import { generateToken } from '../utils/tokenUtil.js';
 
 const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;

@@ -7,6 +7,7 @@ import userRoutes from '../backend/routes/userRoutes.js';
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js'
 import { initializeS3FS } from './utils/fileUploadUtil.js';
 import { Server } from 'socket.io';
+import { verifyToken } from './utils/tokenUtil.js';
 
 //We should always call it on the top. If you use "process.env" before calling it then you will get null for that.
 //So better call it on the top to avoid any mistake.
@@ -69,14 +70,62 @@ const io = new Server(server, {
     }
 });
 
-io.on('connection', (socket) => {
+io.use(async (socket, next) => {
+    try {
+        let user = await verifyToken(socket.handshake.auth.token + "4545");
+        // socket.me('me', socket.id);
+        socket.user = user
+    } catch (err) {
+        // socket.emit('invalidToken', err.message);
+        return next(new Error(err.message));
+    }
+});
+
+io.on('connection', async (socket, next) => {
     // As soon as "setupSocketConnection()" method is called on any client machine it will be fired.
     // It will be called on every new connection request from any client machine.
-    console.log('A user connected');
+    console.log('A user is connected');
+
+    // Join user's own room
+    socket.join(socket.user.id);
 
     //Will be triggered if a user exits or disconnect.
     socket.on('disconnect', () => {
         console.log('user disconnected');
+    });
+
+    socket.on("my message", (msg) => {
+        console.log("message: " + msg);
+        io.emit("my broadcast", `server: ${msg}`);
+    });
+
+    socket.on("join", (roomName) => {
+        console.log("join: " + roomName);
+        socket.join(roomName);
+    });
+
+    socket.on("leave", (roomName) => {
+        console.log("leave: " + roomName);
+        socket.leave(roomName);
+    })
+
+    socket.on("message", ({ message, roomName }) => {
+        console.log("message: " + message + " in " + roomName);
+        // send to all in room except sender
+
+        // generate data to send to receivers
+        const outgoingMessage = {
+            name: socket.user.name,
+            id: socket.user.id,
+            message,
+        };
+
+        socket.to(roomName).emit("message", outgoingMessage);
+        callback({
+            status: "ok"
+        });
+        // send to all in room including sender
+        // io.to(roomName).emit("message", message);
     });
 });
 
