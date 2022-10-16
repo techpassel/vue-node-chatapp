@@ -10,12 +10,16 @@ const initializeS3FS = () => {
         signatureVersion: 'v4'
     }
 
-    s3 = new AWS.S3(s3Options);
-    console.log("S3 bucket initialized", s3);
+    try {
+        s3 = new AWS.S3(s3Options);
+        console.log("S3 bucket initialized successfully");
+    } catch (error) {
+        console.log("Error in initializing S3 bucket - " + error);
+    }
 }
 
 const uploadFile = (filePath, folderPath) => {
-    var uploadParams = { Bucket: process.env.S3_BUCKET_NAME};
+    var uploadParams = { Bucket: process.env.S3_BUCKET_NAME };
     var fileStream = fs.createReadStream(filePath);
     fileStream.on('error', function (err) {
         throw err
@@ -41,9 +45,9 @@ const deleteFile = (filePath) => {
     const deleteParams = { Bucket: process.env.S3_BUCKET_NAME, Key: filePath }
     return new Promise((resolve, reject) => {
         s3.deleteObject(deleteParams, (err, data) => {
-            if(err){
+            if (err) {
                 reject(err)
-            } else if(data) {
+            } else if (data) {
                 resolve()
             }
         })

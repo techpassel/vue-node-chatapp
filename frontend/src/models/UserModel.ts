@@ -1,5 +1,20 @@
 class User {
-    constructor(name: string, email: string, password: string, imageUrl: string) { }
+    id: string;
+    name: string;
+    email: string;
+    isAdmin: boolean;
+    imageUrl: string;
+    token: string;
+
+
+    constructor() {
+        this.id = "",
+        this.name = "",
+        this.email = "",
+        this.isAdmin = false,
+        this.imageUrl = "",
+        this.token = ""
+    }
 }
 
 export default User;
