@@ -6,8 +6,13 @@ import userRoutes from '../backend/routes/userRoutes.js';
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js'
 import { initializeS3FS } from './utils/fileUploadUtil.js';
 
-const __dirname = path.resolve();
+//We should always call it on the top. If you use "process.env" before calling it then you will get null for that.
+//So better call it on the top to avoid any mistake.
 dotenv.config();
+const PATH = process.env.PORT || 5000;
+
+const __dirname = path.resolve();
+
 connectDB();
 initializeS3FS();
 
@@ -27,9 +32,9 @@ app.use(express.json());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
 app.listen(
-    process.env.PORT,
+    PORT,
     console.log(
-        `Server is running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}`
+        `Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`
     )
 ).on('error', err => console.log("Server can't be started. Error :" + err));
 
