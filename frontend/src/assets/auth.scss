@@ -31,15 +31,31 @@
             flex-direction: column;
             gap: 15px;
 
-            input {
-                padding: 15px;
-                padding-left: 5px;
-                border: none;
-                width: 250px;
-                border-bottom: 1px solid #a7bcff;
+            .inputGroup {
+                width: 280px;
 
-                &::placeholder {
-                    color: rgb(175, 175, 175);
+                input {
+                    padding: 15px;
+                    padding-left: 5px;
+                    border: none;
+                    width: 260px;
+                    border-bottom: 1px solid #a7bcff;
+
+                    &::placeholder {
+                        color: rgb(175, 175, 175);
+                    }
+                }
+
+                .inputErrors {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                    margin-bottom: -10px;
+                }
+
+                .errorMsg {
+                    font-size: 12px;
+                    color: #fc0043;
                 }
             }
 
