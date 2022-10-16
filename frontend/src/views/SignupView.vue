@@ -13,6 +13,7 @@ const state = ref({
 
 const passwordMismatchError = ref(false);
 const emailExistError = ref(false);
+const serverError = ref('');
 
 const validationRules = {
     name: {
@@ -93,7 +94,6 @@ const checkPassword = (e: any) => {
                         <div class="errorMsg" v-if="passwordMismatchError">Password and confirm password must be same.
                         </div>
                     </div>
-
                 </div>
                 <div class="inputGroup">
                     <input class="avatar" type="file" id="avatar" />
@@ -102,6 +102,7 @@ const checkPassword = (e: any) => {
                         Add an avatar
                     </label>
                 </div>
+                <div class="errorMsg" v-if="serverError != ''">{{serverError}}</div>
                 <button>Sign up</button>
             </form>
             <p>You do have an account? Login</p>
