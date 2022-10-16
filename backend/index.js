@@ -1,15 +1,17 @@
 import express from 'express';
+import http from 'http';
 import path from 'path';
 import dotenv from 'dotenv';
 import connectDB from './configs/dbConnection.js';
 import userRoutes from '../backend/routes/userRoutes.js';
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js'
 import { initializeS3FS } from './utils/fileUploadUtil.js';
+import { Server } from 'socket.io';
 
 //We should always call it on the top. If you use "process.env" before calling it then you will get null for that.
 //So better call it on the top to avoid any mistake.
 dotenv.config();
-const PATH = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
 const __dirname = path.resolve();
 
@@ -31,7 +33,54 @@ app.use(express.json());
 //Serves all the request which includes /images in the url from 'public' folder
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
+/*
+//Simple way to create and start an express server.
+----------------------------------------------------------------------------------
 app.listen(
+    PORT,
+    console.log(
+        `Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`
+    )
+).on('error', err => console.log("Server can't be started. Error :" + err));
+----------------------------------------------------------------------------------
+But here we will use a different method.Actuall this alternate method is mainly useful with https modules
+(i.e for servers in which you need to transfer data over https).Here we will not use https module instead we will use http module.
+But the method is very similar for both.In case of https server we will need few additional parameters.Example of https server:
+----------------------------------------------------------------------------------
+import https from 'https';
+const privateKey  = fs.readFileSync('certificates/key.pem', 'utf8');
+const certificate = fs.readFileSync('certificates/cert.pem', 'utf8');
+const credentials = {key: privateKey, cert: certificate};
+const server = https.createServer(credentials, app);
+//Now you can start server as follows :
+server.listen(5500);
+----------------------------------------------------------------------------------
+*/
+
+const server = http.createServer(app);
+
+// Creating a 'socket.io' server instance.
+// Here 'Server' is imported from 'socket.io' module and 'server' is defined above.
+const io = new Server(server, {
+    cors: {
+        // origin: '*',
+        origins: ['http://localhost:5173'],
+        methods: ['GET', 'POST']
+    }
+});
+
+io.on('connection', (socket) => {
+    // As soon as "setupSocketConnection()" method is called on any client machine it will be fired.
+    // It will be called on every new connection request from any client machine.
+    console.log('A user connected');
+
+    //Will be triggered if a user exits or disconnect.
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+});
+
+server.listen(
     PORT,
     console.log(
         `Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`
