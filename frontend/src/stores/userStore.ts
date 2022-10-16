@@ -26,13 +26,33 @@ export const useUserStore = defineStore('user', () => {
             user.value = res.data;
             return "Success";
         } catch (err: any) {
-            console.log(err);
             if (err.response) {
                 if (err.response.status == 400) {
                     throw new Error("emailExist");
                 } else {
                     throw new Error(err.response.data.message);
                 }
+            } else {
+                throw new Error(err.message);
+            }
+        }
+    }
+
+    const login = async (data: any) => {
+        try {
+            const res = await Axios.post('http://localhost:4000/user/auth/login',
+                data,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            user.value = res.data;
+            return "Success";
+        } catch (err: any) {
+            if (err.response) {
+                throw new Error(err.response.data.message);
             } else {
                 throw new Error(err.message);
             }
@@ -48,5 +68,5 @@ export const useUserStore = defineStore('user', () => {
         localStorage.setItem('user', JSON.stringify(val));
     }, { deep: true })
 
-    return { user, signup, uploadPercentage }
+    return { user, signup, login, uploadPercentage }
 })
