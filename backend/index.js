@@ -70,13 +70,13 @@ const io = new Server(server, {
     }
 });
 
+//It will work as a middleware for authentication.
 io.use(async (socket, next) => {
     try {
-        let user = await verifyToken(socket.handshake.auth.token + "4545");
-        // socket.me('me', socket.id);
+        let user = await verifyToken(socket.handshake.auth.token);
         socket.user = user
+        next();
     } catch (err) {
-        // socket.emit('invalidToken', err.message);
         return next(new Error(err.message));
     }
 });
@@ -84,39 +84,68 @@ io.use(async (socket, next) => {
 io.on('connection', async (socket, next) => {
     // As soon as "setupSocketConnection()" method is called on any client machine it will be fired.
     // It will be called on every new connection request from any client machine.
-    console.log('A user is connected');
+    // console.log('A user is connected', socket.user.id, socket.user.name);
 
-    // Join user's own room
-    socket.join(socket.user.id);
+    //Socket.emit() is used to send message to self while io.emit() is used to send message to others(including self)
+    //If you want to send message to all except you then use socket.broadcast.emit()
+    //And if you want to send message in a room then use socket.to(roomName).emit().
 
     //Will be triggered if a user exits or disconnect.
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
 
-    socket.on("my message", (msg) => {
-        console.log("message: " + msg);
-        io.emit("my broadcast", `server: ${msg}`);
-    });
-
-    socket.on("join", (roomName) => {
-        console.log("join: " + roomName);
+    socket.on("join", (roomName, callback) => {
         socket.join(roomName);
+        socket.to(roomName).emit("user joined", socket.user)
+        callback({
+            status: "ok"
+        })
     });
 
-    socket.on("leave", (roomName) => {
-        console.log("leave: " + roomName);
+    socket.on("leave", (roomName, callback) => {
         socket.leave(roomName);
+        socket.to(roomName).emit("user left", socket.user)
+        callback({
+            status: "ok"
+        })
+    });
+
+    socket.on("self-message", (message, callback) => {
+        //This message will be sent to you only.
+        socket.emit("for-self", message);
+        callback({
+            status: "ok"
+        })
     })
 
-    socket.on("message", ({ message, roomName }) => {
-        console.log("message: " + message + " in " + roomName);
-        // send to all in room except sender
+    socket.on("others-message", (message, callback) => {
+        //This message will be sent to everyone except you.
+        socket.broadcast.emit("for-others", message);
+        callback({
+            status: "ok"
+        })
+    })
 
-        // generate data to send to receivers
+    socket.on("all-users-message", (message, callback) => {
+        //This message will be sent to everyone including you.
+        io.emit("for-all", message);
+        callback({
+            status: "ok"
+        })
+    })
+
+    socket.on("group-message", ({ message, roomName }, callback) => {
+        // To send to all users in room except the sender
+
+        // Data to send to receivers
         const outgoingMessage = {
-            name: socket.user.name,
-            id: socket.user.id,
+            user: {
+                id: socket.user.id,
+                name: socket.user.name,
+                imageUrl: socket.user.imageUrl,
+                roomName
+            },
             message,
         };
 
@@ -124,8 +153,6 @@ io.on('connection', async (socket, next) => {
         callback({
             status: "ok"
         });
-        // send to all in room including sender
-        // io.to(roomName).emit("message", message);
     });
 });
 

@@ -23,15 +23,12 @@ const verifyToken = async (token) => {
             rejectReason = "Token is expired";
         } else {
             try {
-                // user = await User.findById(decodedToken.id).select({
-                //     id: 1
-                // });
-                user = await User.findById(decodedToken.id).select({ password: 0 });
+                user = await User.findById(decodedToken.id).select({ id: 1, name: 1, imageUrl:1 });
                 if (!user) {
                     rejectReason = "Invalid token";
                 }
             } catch (error) {
-                rejectReason = "Invalid token3";
+                rejectReason = "Invalid token";
             }
         }
     }
