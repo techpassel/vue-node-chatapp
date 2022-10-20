@@ -22,7 +22,7 @@ class SocketioService {
             /*Test methods*/
 
             this.joinGroup("Myroom123", (cb: any) => {
-                console.log(cb.status, "You joined group");
+                console.log(cb.status, "You joined group 123");
             })
 
             this.handleUserJoinedGroup("Myroom123", (cb: any) => {
@@ -31,15 +31,13 @@ class SocketioService {
 
             setTimeout(() => {
                 this.joinGroup("Myroom456", (cb: any) => {
-                    console.log(cb.status, "You joined group");
+                    console.log(cb.status, "You joined group 456");
                 })
 
                 this.handleUserJoinedGroup("Myroom456", (cb: any) => {
                     console.log(cb.name + " Joined group 456");
                 })
             }, 5000);
-
-
 
             setTimeout(() => {
                 this.sendMessageInGroup({ message: "My rooom message", roomName: "Myroom123" }, (cb: any) => {
@@ -48,7 +46,7 @@ class SocketioService {
             }, 20000)
 
             this.subscribeToMessages("Myroom123", (cb: any) => {
-                console.log(cb.message + " -> from user -" + cb.user.name);
+                console.log(cb.message + " -> from user - " + cb.user.name);
             })
             /*Test methods*/
         }
@@ -72,12 +70,12 @@ class SocketioService {
 
     // Handle other user joined group event
     handleUserJoinedGroup = (roomName: string, cb: any) => {
-        if (this.socket) this.socket.on('user joined', cb);
+        if (this.socket) this.socket.on(`user joined ${roomName}`, cb);
     }
 
     // Handle other user left group event
     handleUserLeftGroup = (roomName: string, cb: any) => {
-        if (this.socket) this.socket.on('user left', cb);
+        if (this.socket) this.socket.on(`user left ${roomName}` + roomName, cb);
     }
 
     // To send message to self(No practical use currently - just for demo)
@@ -112,15 +110,15 @@ class SocketioService {
 
     // To send message in group
     sendMessageInGroup = ({ message, roomName }: any, cb: any) => {
-        if (this.socket) this.socket.emit('message', { message, roomName }, cb);
+        this.socket.emit('group-message', { message, roomName }, cb);
     }
 
     // Handle group message receive event
     subscribeToMessages = (roomName: string, cb: any) => {
-        if (this.socket)
-            this.socket.on('message', (msg: any) => {
-                return cb(msg);
-            });
+        // if (!this.socket) return true;
+        this.socket.on(`message ${roomName}`, (msg: any) => {
+            return cb(msg);
+        });
     }
 }
 

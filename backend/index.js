@@ -7,6 +7,8 @@ import userRoutes from '../backend/routes/userRoutes.js';
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js'
 import { initializeS3FS } from './utils/fileUploadUtil.js';
 import { Server } from 'socket.io';
+import { createAdapter } from "@socket.io/redis-adapter";
+import { createClient } from "redis";
 import { verifyToken } from './utils/tokenUtil.js';
 
 //We should always call it on the top. If you use "process.env" before calling it then you will get null for that.
@@ -70,6 +72,16 @@ const io = new Server(server, {
     }
 });
 
+const pubClient = createClient({ url: "redis://default:bjj234h_364345hjh_j489q3we6_ger673fsf@localhost:6379" });
+// await pubClient.connect();
+const subClient = pubClient.duplicate();
+// await subClient.connect();
+
+Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+    io.adapter(createAdapter(pubClient, subClient));
+    console.log("Adaptor connected");
+});
+
 //It will work as a middleware for authentication.
 io.use(async (socket, next) => {
     try {
@@ -84,7 +96,7 @@ io.use(async (socket, next) => {
 io.on('connection', async (socket, next) => {
     // As soon as "setupSocketConnection()" method is called on any client machine it will be fired.
     // It will be called on every new connection request from any client machine.
-    // console.log('A user is connected', socket.user.id, socket.user.name);
+    console.log('A user is connected', socket.user.id, socket.user.name);
 
     //Socket.emit() is used to send message to self while io.emit() is used to send message to others(including self)
     //If you want to send message to all except you then use socket.broadcast.emit()
@@ -97,7 +109,7 @@ io.on('connection', async (socket, next) => {
 
     socket.on("join", (roomName, callback) => {
         socket.join(roomName);
-        socket.to(roomName).emit("user joined", socket.user)
+        socket.to(roomName).emit("user joined " + roomName, socket.user)
         callback({
             status: "ok"
         })
@@ -105,7 +117,7 @@ io.on('connection', async (socket, next) => {
 
     socket.on("leave", (roomName, callback) => {
         socket.leave(roomName);
-        socket.to(roomName).emit("user left", socket.user)
+        socket.to(roomName).emit("user left " + roomName, socket.user)
         callback({
             status: "ok"
         })
@@ -149,7 +161,7 @@ io.on('connection', async (socket, next) => {
             message,
         };
 
-        socket.to(roomName).emit("message", outgoingMessage);
+        socket.to(roomName).emit(`message ${roomName}`, outgoingMessage);
         callback({
             status: "ok"
         });
