@@ -68,6 +68,16 @@ class SocketioService {
         if (this.socket) this.socket.emit("leave", roomName, cb);
     }
 
+    // To inform other users in a group that you are typing 
+    typingMessageInform = (roomName: string, cb: any) => {
+        if (this.socket) this.socket.emit("me typing", roomName, cb);
+    }
+
+    // To inform other users in a group that you stopped typing 
+    typingMessageEndInform = (roomName: string, cb: any) => {
+        if (this.socket) this.socket.emit("me typing end", roomName, cb);
+    }
+
     // Handle other user joined group event
     handleUserJoinedGroup = (roomName: string, cb: any) => {
         if (this.socket) this.socket.on(`user joined ${roomName}`, cb);
@@ -76,6 +86,16 @@ class SocketioService {
     // Handle other user left group event
     handleUserLeftGroup = (roomName: string, cb: any) => {
         if (this.socket) this.socket.on(`user left ${roomName}` + roomName, cb);
+    }
+
+    // Handle other user in the group is typing event
+    HandleMessageTyping = (roomName: string, cb: any) => {
+        if (this.socket) this.socket.emit(`user typing ${roomName}`, roomName, cb);
+    }
+
+    // Handle other user in the group is typing event
+    HandleMessageTypingEnd = (roomName: string, cb: any) => {
+        if (this.socket) this.socket.emit(`user typing end ${roomName}`, roomName, cb);
     }
 
     // To send message to self(No practical use currently - just for demo)
@@ -110,15 +130,24 @@ class SocketioService {
 
     // To send message in group
     sendMessageInGroup = ({ message, roomName }: any, cb: any) => {
-        this.socket.emit('group-message', { message, roomName }, cb);
+        if (this.socket) this.socket.emit('group message', { message, roomName }, cb);
+    }
+
+    // To delete message in group
+    deleteMessageInGroup = ({ messageId, roomName }: any, cb: any) => {
+        if (this.socket) this.socket.emit('delete group message', { messageId, roomName }, cb);
     }
 
     // Handle group message receive event
     subscribeToMessages = (roomName: string, cb: any) => {
-        // if (!this.socket) return true;
-        this.socket.on(`message ${roomName}`, (msg: any) => {
-            return cb(msg);
-        });
+        if (this.socket)
+            this.socket.on(`message ${roomName}`, cb);
+    }
+
+    // Handle group message receive event
+    subscribeToDeleteMessages = (roomName: string, cb: any) => {
+        if (this.socket)
+            this.socket.on(`message delete ${roomName}`, cb);
     }
 }
 

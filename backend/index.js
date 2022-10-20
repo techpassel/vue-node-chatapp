@@ -73,14 +73,12 @@ const io = new Server(server, {
 });
 
 const pubClient = createClient({ url: "redis://default:bjj234h_364345hjh_j489q3we6_ger673fsf@localhost:6379" });
-// await pubClient.connect();
 const subClient = pubClient.duplicate();
-// await subClient.connect();
 
-Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-    io.adapter(createAdapter(pubClient, subClient));
-    console.log("Adaptor connected");
-});
+await Promise.all([pubClient.connect(), subClient.connect()]);
+console.log("Adaptor connected");
+io.adapter(createAdapter(pubClient, subClient));
+
 
 //It will work as a middleware for authentication.
 io.use(async (socket, next) => {
@@ -109,7 +107,7 @@ io.on('connection', async (socket, next) => {
 
     socket.on("join", (roomName, callback) => {
         socket.join(roomName);
-        socket.to(roomName).emit("user joined " + roomName, socket.user)
+        socket.to(roomName).emit(`user joined ${roomName}`, socket.user)
         callback({
             status: "ok"
         })
@@ -117,11 +115,19 @@ io.on('connection', async (socket, next) => {
 
     socket.on("leave", (roomName, callback) => {
         socket.leave(roomName);
-        socket.to(roomName).emit("user left " + roomName, socket.user)
+        socket.to(roomName).emit(`user left ${roomName}`, socket.user)
         callback({
             status: "ok"
         })
     });
+
+    socket.on("me typing", (roomName) => {
+        socket.to(roomName).emit(`user typing ${roomName}`, socket.user)
+    })
+
+    socket.on("me typing end", (roomName) => {
+        socket.to(roomName).emit(`user typing end ${roomName}`, socket.user)
+    })
 
     socket.on("self-message", (message, callback) => {
         //This message will be sent to you only.
@@ -147,9 +153,7 @@ io.on('connection', async (socket, next) => {
         })
     })
 
-    socket.on("group-message", ({ message, roomName }, callback) => {
-        // To send to all users in room except the sender
-
+    socket.on("group message", ({ message, roomName }, callback) => {
         // Data to send to receivers
         const outgoingMessage = {
             user: {
@@ -161,6 +165,20 @@ io.on('connection', async (socket, next) => {
             message,
         };
 
+        // To send to all users in room except the sender
+        socket.to(roomName).emit(`message ${roomName}`, outgoingMessage);
+        callback({
+            status: "ok"
+        });
+    });
+
+    socket.on("delete group message", ({ messageId, roomName }, callback) => {
+        // Data to send to receivers
+        const outgoingMessage = {
+            messageId,
+        };
+
+        // To send to all users in room except the sender
         socket.to(roomName).emit(`message ${roomName}`, outgoingMessage);
         callback({
             status: "ok"
