@@ -72,6 +72,9 @@ const io = new Server(server, {
     }
 });
 
+//Following redis related configuration is particularly needed in case you want to use multiple instances of node servers in you chat app.
+//For more details check - https://socket.io/docs/v3/using-multiple-nodes/#Passing-events-between-nodes
+
 const pubClient = createClient({ url: "redis://default:bjj234h_364345hjh_j489q3we6_ger673fsf@localhost:6379" });
 const subClient = pubClient.duplicate();
 
