@@ -8,6 +8,8 @@ import { notFound, errorHandler } from './middlewares/errorMiddleware.js'
 import { initializeS3FS } from './utils/fileUploadUtil.js';
 import { Server } from 'socket.io';
 import listenSocketIo from './utils/sockeketUtil.js';
+import { connectRedis } from './configs/redisConnection.js';
+import { setRedisClient } from './servicecs/chatService.js';
 
 //We should always call it on the top. If you use "process.env" before calling it then you will get null for that.
 //So better call it on the top to avoid any mistake.
@@ -17,7 +19,9 @@ const PORT = process.env.PORT || 5000;
 const __dirname = path.resolve();
 
 connectDB();
+connectRedis();
 initializeS3FS();
+setRedisClient();
 
 const allowCrossDomain = function (req, res, next) {
     res.header('Access-Control-Allow-Origin', "*");
