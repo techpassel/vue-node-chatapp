@@ -3,8 +3,9 @@ import http from 'http';
 import path from 'path';
 import dotenv from 'dotenv';
 import connectDB from './configs/dbConnection.js';
-import userRoutes from '../backend/routes/userRoutes.js';
-import { notFound, errorHandler } from './middlewares/errorMiddleware.js'
+import userRoutes from './routes/userRoute.js';
+import messageRoutes from './routes/messageRoute.js';
+import { notFound, errorHandler } from './middlewares/errorMiddleware.js';
 import { initializeS3FS } from './utils/fileUploadUtil.js';
 import { Server } from 'socket.io';
 import listenSocketIo from './utils/sockeketUtil.js';
@@ -70,7 +71,7 @@ const io = new Server(server, {
     cors: {
         // origin: '*',
         origins: ['http://localhost:5173'],
-        methods: ['GET', 'POST']
+        methods: ['GET', 'POST', 'PUT', 'DELETE']
     }
 });
 
@@ -89,6 +90,7 @@ app.get('/test', (req, res) => {
 });
 
 app.use('/user', userRoutes);
+app.use('/message', messageRoutes)
 
 app.use(notFound)
 app.use(errorHandler)

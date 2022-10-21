@@ -123,7 +123,6 @@ const listenSocketIo = async (io) => {
             });
         });
     });
-
 }
 
 export default listenSocketIo;

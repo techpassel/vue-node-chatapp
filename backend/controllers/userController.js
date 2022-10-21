@@ -61,7 +61,23 @@ const authenticateUser = asyncHandler(async (req, res) => {
     }
 })
 
+const searchUser = asyncHandler(async (req, res) => {
+    //Url should be in format - http://localhost:4000/user/search?key=am
+    const { key } = req.query;
+    const regex = new RegExp(key, 'i') // i for case insensitive
+    console.log(regex);
+    const users = await User.find({
+        $or:
+            [
+                { name: { $regex: regex } },
+                { email: key }
+            ]
+    }).select({ _id: 1, name: 1, imageUrl: 1 })
+    res.send(users);
+})
+
 export {
     registerUser,
-    authenticateUser
+    authenticateUser,
+    searchUser
 }

@@ -12,6 +12,7 @@ const userJoined = async (userId, socketId) => {
     if (!user) {
         data = {
             socketIds: [socketId],
+            activeFriends: [],          //Will replace it later
             activeVideoChatGroup: null,
         }
     } else {

@@ -1,16 +1,16 @@
 import mongoose, { isObjectIdOrHexString } from "mongoose";
-import User from "./userModel";
 
 const chatGroupSchema = mongoose.Schema({
+    //groupName, isMultiUserGroup and users.isAdmin and users.isAdmin will be used in case of multiuser group only.
+    groupName: {
+        type: String,
+        required: false,
+        default: false
+    },
     isMultiUserGroup: {
         type: Boolean,
         required: false,
         default: false
-    },
-    superAdmin: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: false,
-        ref: 'User'
     },
     users: [
         {

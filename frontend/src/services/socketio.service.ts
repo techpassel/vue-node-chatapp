@@ -1,10 +1,8 @@
 import { io } from 'socket.io-client';
 import { useUserStore } from '@/stores/userStore';
-import type User from '@/models/UserModel';
 
 //In Vue + Vite projects 'process.env' is replaced by 'import.meta.env'
 const serverUrl = import.meta.env.VITE_BACKEND_ENDPOINT
-
 
 class SocketioService {
     socket: any;
@@ -20,7 +18,6 @@ class SocketioService {
             this.socket = io(serverUrl, { auth: { token: userStore.user.token } })
 
             /*Test methods*/
-
             this.joinGroup("Myroom123", (cb: any) => {
                 console.log(cb.status, "You joined group 123");
             })

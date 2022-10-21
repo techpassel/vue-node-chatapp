@@ -21,6 +21,12 @@ const userSchema = mongoose.Schema(
             required: true,
             default: false,
         },
+        isActive: {
+            type: Boolean,
+            required: true,
+            default: true,
+            //For now we made deafult as true but later by default it will be false and will be true after email verification only.
+        },
         imageUrl: {
             type: String,
             required: false,
