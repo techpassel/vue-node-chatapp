@@ -54,6 +54,10 @@ const addUserInMessageGroup = asyncHandler(async (req, res) => {
     if (!group) {
         throw new Error("MessageGroup with given Id not found")
     }
+    if (!group.isMultiUserGroup) {
+        throw new Error("Users can't be added in this group")
+    }
+
     const currentUser = group.users.find(e => e.userId == req.user.id)
     if (!currentUser || !currentUser?.isAdmin) {
         throw new Error("You don't have permission to perform this task")
@@ -171,11 +175,40 @@ const deleteMessageGroup = asyncHandler(async (req, res) => {
     res.status(200).send("Message group deleted successfully");
 })
 
+const getMessageGroupDetails = asyncHandler(async (req, res) => {
+    const groupId = req.params.id;
+
+    const group = await ChatGroup.findById(groupId);
+    res.status(200).json(group);
+})
+
+const getUsersMessageGroups = asyncHandler(async (req, res) => {
+    const userId = req.params.userId;
+
+    let user = await User.findOne({ _id: userId, isActive: true }).select({ _id: 1 });
+    if (!user) {
+        throw new Error("User with given Id not found")
+    }
+
+    const groups = await ChatGroup.find({ "users.userId": userId });
+    res.status(200).json(groups);
+})
+
+const updateMessageGroupName = asyncHandler(async (req, res) => {
+    const { newGroupName, groupId } = req.body;
+
+    const updatedGroup = await ChatGroup.findOneAndUpdate({ _id: groupId }, { $set: { groupName: newGroupName } }, { new: 1 });
+    res.status(200).json(updatedGroup);
+})
+
 export {
     createMessageGroup,
     addUserInMessageGroup,
     removeUserFromMessageGroup,
     addUserAdminPrivilege,
     removeUserAdminPrivilege,
-    deleteMessageGroup
+    deleteMessageGroup,
+    getMessageGroupDetails,
+    getUsersMessageGroups,
+    updateMessageGroupName
 }
