@@ -5,12 +5,17 @@ const chatGroupSchema = mongoose.Schema({
     groupName: {
         type: String,
         required: false,
-        default: false
+        default: ''
     },
     isMultiUserGroup: {
         type: Boolean,
         required: false,
         default: false
+    },
+    groupImageUrl: {
+        type: String,
+        required: false, 
+        default: ''
     },
     users: [
         {

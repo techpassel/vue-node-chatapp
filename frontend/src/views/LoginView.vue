@@ -8,8 +8,6 @@ import router from '@/router';
 const userStore = useUserStore();
 const { login } = userStore;
 
-
-
 const serverError = ref<string>('');
 
 const state = ref({

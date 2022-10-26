@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import Navbar from "./Navbar.vue";
 import Search from "./Search.vue";
-import ChatRoom from "./ChatRoom.vue";
+import ChatRooms from "./ChatRooms.vue";
+import { useUserStore } from '../stores/userStore'
+
+const { logout } = useUserStore();
 
 </script>
 
@@ -9,8 +12,8 @@ import ChatRoom from "./ChatRoom.vue";
     <div class="sidebar">
         <Navbar />
         <Search />
-        <ChatRoom />
-        <div class="logoutBtn">
+        <ChatRooms />
+        <div class="logoutBtn" @click="logout">
             <font-awesome-icon class="logoutIcon" icon="fa-solid fa-right-from-bracket" />
             <span>Logout</span>
         </div>

@@ -2,10 +2,12 @@ import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
 import type User from '@/models/UserModel'
 import Axios from 'axios';
+import router from '@/router';
 
 export const useUserStore = defineStore('user', () => {
-    const user = ref<User>();
+    const user = ref<User | null>(null);
     const uploadPercentage = ref<number>(0);
+    const searchedUsers = ref<User[]>([]);
 
     const signup = async (data: any) => {
         try {
@@ -59,14 +61,44 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+    const logout = () => {
+        user.value = null;
+        router.push('/auth/login')
+    }
+
+    const searchUser = async (str: string) => {
+        try {
+            let res = await Axios.get(`http://localhost:4000/user/search?key=${str}`, {
+                headers: {
+                    'Authorization': `Bearer ${user.value?.token}`
+                }
+            });
+            searchedUsers.value = res.data;
+        } catch (err: any) {
+            if (err.response) {
+                throw new Error(err.response.data.message);
+            } else {
+                throw new Error(err.message);
+            }
+        }
+    }
+
     const persistingUser = localStorage.getItem("user");
     if (persistingUser) {
         user.value = JSON.parse(persistingUser);
     }
 
     watch(user, val => {
-        localStorage.setItem('user', JSON.stringify(val));
+        if (val) localStorage.setItem('user', JSON.stringify(val));
+        else localStorage.removeItem('user')
     }, { deep: true })
 
-    return { user, signup, login, uploadPercentage }
+    return {
+        user,
+        signup,
+        login,
+        uploadPercentage,
+        logout,
+        searchUser
+    }
 })

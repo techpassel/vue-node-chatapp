@@ -7,10 +7,13 @@ const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
     const userExists = await User.findOne({ email });
 
-    // const image = req.files.image[0].path;
-    const image = req.file.path;
-    const imageUrl = await uploadFile(image, "profile-image");
-
+    const imageUrl = '';
+    if (req.file) {
+        // const image = req.files.image[0].path;
+        const image = req.file.path;
+        imageUrl = await uploadFile(image, "profile-image");
+    }
+    
     if (userExists) {
         res.status(400);
         throw new Error('User already exists');
