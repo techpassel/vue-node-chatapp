@@ -213,8 +213,26 @@ const getUsersMessageGroups = asyncHandler(async (req, res) => {
         {
             $lookup: {
                 from: 'users',
-                localField: 'users.userId',
-                foreignField: '_id',
+                // localField: 'users.userId',
+                // foreignField: '_id',
+                let: { userId: '$users.userId' },
+                pipeline: [
+                    {
+                        '$match': {
+                            '$expr':
+                            {
+                                '$eq': ['$_id', '$$userId']
+                            }
+                        }
+                    },
+                    {
+                        '$project': {
+                            '_id': 1,
+                            'name': 1,
+                            'imageUrl': 1
+                        }
+                    }
+                ],
                 as: 'users.info'
             }
         },
