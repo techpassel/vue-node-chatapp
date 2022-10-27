@@ -9,14 +9,12 @@ import { storeToRefs } from 'pinia';
 
 const messageStore = useMessageStore();
 const { currentRoomInfo } = storeToRefs(messageStore);
-
-
 </script>
 
 <template>
     <div class="chat">
         <div class="chatInfo">
-            <span>{{currentRoomInfo?.name}}</span>
+            <span>{{ currentRoomInfo?.name }}</span>
             <div class="chatIcons">
                 <img :src="Cam" alt="">
                 <img :src="Add" alt="">

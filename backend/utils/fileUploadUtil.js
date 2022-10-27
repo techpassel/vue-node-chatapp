@@ -54,8 +54,24 @@ const deleteFile = (filePath) => {
     })
 }
 
+const readFile = (filePath) => {
+    // filePath = 'profile-image/666361951525-image-632909038.jpg';
+    const params = { Bucket: process.env.S3_BUCKET_NAME, Key: filePath }
+    return new Promise((resolve, reject) => {
+        s3.getObject(params, function (err, data) {
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Successfully dowloaded data from  bucket");
+                resolve(data);
+            }
+        });
+    })
+}
+
 export {
     initializeS3FS,
     uploadFile,
-    deleteFile
+    deleteFile,
+    readFile
 }

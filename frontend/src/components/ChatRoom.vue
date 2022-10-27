@@ -5,13 +5,14 @@ import type ChatRoom from '../models/ChatRoomModel'
 const props = defineProps({
     data: Object as PropType<ChatRoom>
 })
+const serverUrl = import.meta.env.VITE_BACKEND_ENDPOINT
 
 </script>
 
 <template>
     <div class="userChat">
-        <img src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600"
-            alt="">
+        <img :src="serverUrl + '/image/' + data?.imageUrl" alt="" v-if="data?.imageUrl && data?.imageUrl != ''">
+        <div class="groupNameIcon" v-else>{{ data?.name.charAt(0) }}</div>
         <div class="userChatInfo">
             <span class="roomName">{{ data?.name }}</span>
             <span class="msg">

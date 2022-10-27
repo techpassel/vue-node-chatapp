@@ -6,7 +6,7 @@ import connectDB from './configs/dbConnection.js';
 import userRoutes from './routes/userRoute.js';
 import messageRoutes from './routes/messageRoute.js';
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js';
-import { initializeS3FS } from './utils/fileUploadUtil.js';
+import { initializeS3FS, readFile } from './utils/fileUploadUtil.js';
 import { Server } from 'socket.io';
 import listenSocketIo from './utils/sockeketUtil.js';
 import { connectRedis } from './configs/redisConnection.js';
@@ -90,7 +90,13 @@ app.get('/test', (req, res) => {
 });
 
 app.use('/user', userRoutes);
-app.use('/message', messageRoutes)
+app.use('/message', messageRoutes);
+app.get("/image/:path(*)", async (req, res) => {
+    let file = await readFile(req.params.path);
+    res.attachment(req.params.path);
+    res.type(file.ContentType);
+    res.send(file.Body);
+})
 
 app.use(notFound)
 app.use(errorHandler)
