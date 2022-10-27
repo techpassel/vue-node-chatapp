@@ -14,8 +14,9 @@ const props = defineProps({
             alt="">
         <div class="userChatInfo">
             <span class="roomName">{{ data?.name }}</span>
-            <!-- <span class="msg">{{ data?.latestMsg ? data?.latestMsg : 'No message yet.' }}</span> -->
-            <span>{{data?.id}}</span>
+            <span class="msg">
+                {{ data?.latestMsg && data?.latestMsg != '' ? data?.latestMsg : 'No message yet.' }}
+            </span>
         </div>
     </div>
 </template>
