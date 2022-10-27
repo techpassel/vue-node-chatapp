@@ -1,11 +1,21 @@
+<script lang="ts" setup>
+import { useUserStore } from '@/stores/userStore';
+import { storeToRefs } from 'pinia';
+
+const userStore = useUserStore();
+const { user } = storeToRefs(userStore);
+
+const serverUrl = import.meta.env.VITE_BACKEND_ENDPOINT
+</script>
+
 <template>
     <div class="navbar">
         <div class="logo">
             Ennaman Chat
         </div>
         <div class="user">
-            <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600" alt="">
-            <span>Aman Saurabh</span>
+            <img :src="serverUrl + '/image/' + user?.imageUrl" alt="Profile image">
+            <span>{{user?.name}}</span>
         </div>
     </div>
 </template>

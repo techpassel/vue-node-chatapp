@@ -41,7 +41,7 @@ export const useMessageStore = defineStore('message', () => {
                 data.name = group.groupName;
                 data.imageUrl = group.groupImageUrl;
             } else {
-                const otherUser = group.users.find(u => u._id != user.value?.id)
+                const otherUser = group.users.find(u => u.userId != user.value?.id)
                 if (otherUser) {
                     data.name = otherUser?.info.name
                     data.imageUrl = otherUser?.info.imageUrl
