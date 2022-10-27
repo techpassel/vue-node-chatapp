@@ -62,7 +62,6 @@ const readFile = (filePath) => {
             if (err) {
                 reject(err);
             } else {
-                console.log("Successfully dowloaded data from  bucket");
                 resolve(data);
             }
         });

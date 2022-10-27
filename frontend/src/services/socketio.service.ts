@@ -18,6 +18,7 @@ class SocketioService {
             this.socket = io(serverUrl, { auth: { token: userStore.user.token } })
 
             /*Test methods*/
+            /*
             this.joinGroup("Myroom123", (cb: any) => {
                 console.log(cb.status, "You joined group 123");
             })
@@ -49,7 +50,8 @@ class SocketioService {
             setTimeout(() => {
                 this.disconnect()
             }, 30000);
-            /*Test methods*/
+            */
+            /*Test methods end*/
         }
     }
 
@@ -80,23 +82,23 @@ class SocketioService {
     }
 
     // Handle other user joined group event
-    handleUserJoinedGroup = (roomId: string, cb: any) => {
-        if (this.socket) this.socket.on(`user joined ${roomId}`, cb);
+    handleUserJoinedGroup = (cb: any) => {
+        if (this.socket) this.socket.on(`user joined`, cb);
     }
 
     // Handle other user left group event
-    handleUserLeftGroup = (roomId: string, cb: any) => {
-        if (this.socket) this.socket.on(`user left ${roomId}` + roomId, cb);
+    handleUserLeftGroup = (cb: any) => {
+        if (this.socket) this.socket.on(`user left`, cb);
     }
 
     // Handle other user in the group is typing event
-    HandleMessageTyping = (roomId: string, cb: any) => {
-        if (this.socket) this.socket.emit(`user typing ${roomId}`, roomId, cb);
+    HandleMessageTyping = (cb: any) => {
+        if (this.socket) this.socket.emit(`user typing`, cb);
     }
 
     // Handle other user in the group is typing event
-    HandleMessageTypingEnd = (roomId: string, cb: any) => {
-        if (this.socket) this.socket.emit(`user typing end ${roomId}`, roomId, cb);
+    HandleMessageTypingEnd = (cb: any) => {
+        if (this.socket) this.socket.emit(`user typing end`, cb);
     }
 
     // To send message to self(No practical use currently - just for demo)
@@ -140,15 +142,15 @@ class SocketioService {
     }
 
     // Handle group message receive event
-    subscribeToMessages = (roomId: string, cb: any) => {
+    subscribeToMessages = (cb: any) => {
         if (this.socket)
-            this.socket.on(`message ${roomId}`, cb);
+            this.socket.on(`message`, cb);
     }
 
     // Handle group message receive event
-    subscribeToDeleteMessages = (roomId: string, cb: any) => {
+    subscribeToDeleteMessages = (cb: any) => {
         if (this.socket)
-            this.socket.on(`message delete ${roomId}`, cb);
+            this.socket.on(`message delete`, cb);
     }
 }
 

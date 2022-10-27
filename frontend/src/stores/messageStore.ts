@@ -4,6 +4,7 @@ import Axios from 'axios';
 import { useUserStore } from './userStore'
 import ChatRoom from '@/models/ChatRoomModel';
 import type MessageGroup from '@/models/MessageGroupModel';
+import { joinChatGroups } from '@/services/chat.service';
 
 export const useMessageStore = defineStore('message', () => {
     const messageGroups = ref<MessageGroup[]>([]);
@@ -19,9 +20,12 @@ export const useMessageStore = defineStore('message', () => {
                     'Authorization': `Bearer ${user.value?.token}`
                 }
             });
-            messageGroups.value = res.data;
-            if (res.data.length > 0)
+
+            if (res.data.length > 0) {
+                messageGroups.value = res.data;
                 currentRoomId.value = res.data[0]._id;
+                joinChatGroups(res.data);
+            }
         } catch (err: any) {
             if (err.response) {
                 throw new Error(err.response.data.message);

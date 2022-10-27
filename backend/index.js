@@ -10,7 +10,7 @@ import { initializeS3FS, readFile } from './utils/fileUploadUtil.js';
 import { Server } from 'socket.io';
 import listenSocketIo from './utils/sockeketUtil.js';
 import { connectRedis } from './configs/redisConnection.js';
-import { setRedisClient } from './servicecs/chatService.js';
+import { setRedisClient } from './services/chatService.js';
 
 //We should always call it on the top. If you use "process.env" before calling it then you will get null for that.
 //So better call it on the top to avoid any mistake.

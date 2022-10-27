@@ -1,6 +1,6 @@
 import { createAdapter } from "@socket.io/redis-adapter";
 import { getRedisClient } from "../configs/redisConnection.js";
-import { userJoined, userLeft } from "../servicecs/chatService.js";
+import { userJoined, userLeft } from "../services/chatService.js";
 import { verifyToken } from '../utils/tokenUtil.js';
 
 const listenSocketIo = async (io) => {
@@ -27,9 +27,6 @@ const listenSocketIo = async (io) => {
     });
 
     io.on('connection', async (socket, next) => {
-        // As soon as "setupSocketConnection()" method is called on any client machine it will be fired.
-        // It will be called on every new connection request from any client machine.
-        await userJoined(socket.user.id, socket.id);
 
         //Socket.emit() is used to send message to self while io.emit() is used to send message to others(including self)
         //If you want to send message to all except you then use socket.broadcast.emit()
@@ -38,14 +35,11 @@ const listenSocketIo = async (io) => {
         //Will be triggered if a user exits or disconnect.
         socket.on('disconnect', async () => {
             console.log('User disconnected', socket.user.name);
-            let userData = await userLeft(socket.user.id, socket.id);
-            // We can use this userData to emit event to inform other users that this user is now offline.
-            // We will use it later.
         });
 
         socket.on("join", async (roomId, callback) => {
             socket.join(roomId);
-            socket.to(roomId).emit(`user joined ${roomId}`, socket.user)
+            socket.to(roomId).emit(`user joined`, { room: roomId, user: socket.user })
             callback({
                 status: "ok"
             })
@@ -53,18 +47,24 @@ const listenSocketIo = async (io) => {
 
         socket.on("leave", async (roomId, callback) => {
             socket.leave(roomId);
-            socket.to(roomId).emit(`user left ${roomId}`, socket.user)
+            socket.to(roomId).emit(`user left`, { room: roomId, user: socket.user })
             callback({
                 status: "ok"
             })
         });
 
         socket.on("me typing", (roomId) => {
-            socket.to(roomId).emit(`user typing ${roomId}`, socket.user)
+            socket.to(roomId).emit(`user typing`, { room: roomId, user: socket.user })
+            callback({
+                status: "ok"
+            })
         })
 
         socket.on("me typing end", (roomId) => {
-            socket.to(roomId).emit(`user typing end ${roomId}`, socket.user)
+            socket.to(roomId).emit(`user typing end`, { room: roomId, user: socket.user })
+            callback({
+                status: "ok"
+            })
         })
 
         socket.on("self-message", (message, callback) => {
@@ -94,17 +94,13 @@ const listenSocketIo = async (io) => {
         socket.on("group message", ({ message, roomId }, callback) => {
             // Data to send to receivers
             const outgoingMessage = {
-                user: {
-                    id: socket.user.id,
-                    name: socket.user.name,
-                    imageUrl: socket.user.imageUrl,
-                    roomId
-                },
+                user: socket.user,
+                room: roomId,
                 message,
             };
 
             // To send to all users in room except the sender
-            socket.to(roomId).emit(`message ${roomId}`, outgoingMessage);
+            socket.to(roomId).emit(`message`, outgoingMessage);
             callback({
                 status: "ok"
             });
@@ -113,11 +109,13 @@ const listenSocketIo = async (io) => {
         socket.on("delete group message", ({ messageId, roomId }, callback) => {
             // Data to send to receivers
             const outgoingMessage = {
-                messageId,
+                user: socket.user,
+                room: roomId,
+                messageId: messageId,
             };
 
             // To send to all users in room except the sender
-            socket.to(roomId).emit(`message ${roomId}`, outgoingMessage);
+            socket.to(roomId).emit(`message delete`, outgoingMessage);
             callback({
                 status: "ok"
             });
