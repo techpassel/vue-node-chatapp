@@ -7,6 +7,7 @@ import type MessageGroup from '@/models/MessageGroupModel';
 
 export const useMessageStore = defineStore('message', () => {
     const messageGroups = ref<MessageGroup[]>([]);
+    const currentRoomId = ref<string>();
     const userStore = useUserStore();
     //For state and Getters(i.e. computed properties we need to use 'storeToRefs'  but not for actions)
     const { user } = storeToRefs(userStore);
@@ -19,6 +20,8 @@ export const useMessageStore = defineStore('message', () => {
                 }
             });
             messageGroups.value = res.data;
+            if (res.data.length > 0)
+                currentRoomId.value = res.data[0]._id;
         } catch (err: any) {
             if (err.response) {
                 throw new Error(err.response.data.message);
@@ -48,9 +51,17 @@ export const useMessageStore = defineStore('message', () => {
         })
     })
 
+    const setCurrentRoomId = (roomId: string) => {
+        currentRoomId.value = roomId;
+    }
+
+    const currentRoomInfo = computed(() => messageGroupsInFormat.value.find(m => m.id == currentRoomId.value));
+
     return {
         messageGroups,
+        currentRoomInfo,
         getUsersMessageGroups,
-        messageGroupsInFormat
+        messageGroupsInFormat,
+        setCurrentRoomId,
     }
 })

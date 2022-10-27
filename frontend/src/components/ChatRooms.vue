@@ -9,18 +9,22 @@ const userStore = useUserStore();
 const messageStore = useMessageStore();
 //For state and Getters(i.e. computed properties we need to use 'storeToRefs'  but not for actions)
 const { user } = storeToRefs(userStore);
-const { getUsersMessageGroups } = messageStore;
+const { getUsersMessageGroups, setCurrentRoomId } = messageStore;
 const { messageGroupsInFormat } = storeToRefs(messageStore);
 
 onMounted(async () => {
     if (user.value) await getUsersMessageGroups();
 })
 
+const roomSelected = (roomId: string) => {
+    setCurrentRoomId(roomId);
+}
+
 </script>
 
 <template>
     <div class="chatRoom">
-        <ChatRoom v-for="group of messageGroupsInFormat" :data="group" />
+        <ChatRoom v-for="group of messageGroupsInFormat" :data="group" @click="roomSelected(group.id)" />
     </div>
 </template>
 

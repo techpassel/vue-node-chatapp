@@ -4,13 +4,19 @@ import Add from '../assets/images/add.png';
 import More from '../assets/images/more.png';
 import Messages from './Messages.vue';
 import Input from './Input.vue';
+import { useMessageStore } from '@/stores/messageStore';
+import { storeToRefs } from 'pinia';
+
+const messageStore = useMessageStore();
+const { currentRoomInfo } = storeToRefs(messageStore);
+
 
 </script>
 
 <template>
     <div class="chat">
         <div class="chatInfo">
-            <span>Jane</span>
+            <span>{{currentRoomInfo?.name}}</span>
             <div class="chatIcons">
                 <img :src="Cam" alt="">
                 <img :src="Add" alt="">
