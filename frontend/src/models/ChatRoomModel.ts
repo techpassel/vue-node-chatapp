@@ -1,4 +1,4 @@
-class MessageGroup {
+class ChatRoom {
     id: string;
     name: string;
     isMultiUserGroup: boolean;
@@ -14,4 +14,4 @@ class MessageGroup {
     }
 }
 
-export default MessageGroup
+export default ChatRoom

@@ -4,39 +4,23 @@ import { useUserStore } from "@/stores/userStore";
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
 import ChatRoom from './ChatRoom.vue';
-import MessageGroup from '@/models/MessageGroup';
 
 const userStore = useUserStore();
 const messageStore = useMessageStore();
 //For state and Getters(i.e. computed properties we need to use 'storeToRefs'  but not for actions)
 const { user } = storeToRefs(userStore);
 const { getUsersMessageGroups } = messageStore;
-const { messageGroups } = storeToRefs(messageStore);
+const { messageGroupsInFormat } = storeToRefs(messageStore);
 
 onMounted(async () => {
-    if (user.value) await getUsersMessageGroups(user.value.id);
+    if (user.value) await getUsersMessageGroups();
 })
 
-const getGroupDataAsProps = (group: any) => {
-    let data = new MessageGroup();
-    data.id = group.id;
-    data.isMultiUserGroup = group.isMultiUserGroup;
-    if (group.isMultiUserGroup) {
-        data.name = group.name;
-        data.imageUrl = group.groupImageUrl;
-    } else {
-        let otherUser = group.users.find((u: any) => u.id != user.value?.id)
-        data.name = otherUser.name;
-        data.imageUrl = otherUser.imageUrl;
-    }
-    data.latestMsg = group.latestMsg;
-    return data;
-}
 </script>
 
 <template>
     <div class="chatRoom">
-        <ChatRoom v-for="group of messageGroups" :data="getGroupDataAsProps(group)" />
+        <ChatRoom v-for="group of messageGroupsInFormat" :data="group" />
     </div>
 </template>
 

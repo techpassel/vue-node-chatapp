@@ -227,7 +227,7 @@ const getUsersMessageGroups = asyncHandler(async (req, res) => {
                     },
                     {
                         '$project': {
-                            '_id': 1,
+                            '_id': 0,
                             'name': 1,
                             'imageUrl': 1
                         }
