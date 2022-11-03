@@ -1,40 +1,14 @@
 import type MessageGroup from '@/models/MessageGroupModel';
-import type Message from '@/models/MessageModel';
-import SocketioService from '@/services/socketio.service';
+import socketioService from '@/services/socketio.service';
+import { subscribeToUserRooms } from '@/services/chatHelper.service';
 
 const joinChatGroups = (groups: MessageGroup[]) => {
     groups.forEach(g => {
-        SocketioService.joinGroup(g._id, (res: any) => {
+        socketioService.joinGroup(g._id, (res: any) => {
             // console.log(res);
         });
     })
     subscribeToUserRooms();
-}
-
-const subscribeToUserRooms = () => {
-    SocketioService.handleUserJoinedGroup((data: any) => {
-
-    });
-
-    SocketioService.handleUserLeftGroup((data: any) => {
-
-    });
-
-    SocketioService.handleMessageTyping((data: any) => {
-
-    });
-
-    SocketioService.handleMessageTypingEnd((data: any) => {
-
-    });
-
-    SocketioService.subscribeToMessages((data: any) => {
-
-    });
-
-    SocketioService.subscribeToDeleteMessages((data: any) => {
-
-    });
 }
 
 export {
