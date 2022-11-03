@@ -37,13 +37,6 @@ const subscribeToUserRooms = () => {
     });
 }
 
-const sendMessageInGroup = (message: string, roomId: string) => {
-    SocketioService.sendMessageInGroup({ message, roomId }, (msg: Message) => {
-        // console.log(msg);
-    });
-}
-
 export {
-    joinChatGroups,
-    sendMessageInGroup
+    joinChatGroups
 }

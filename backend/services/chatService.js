@@ -49,7 +49,6 @@ const saveGroupMessage = async (data) => {
         // fileUrl: data.fileUrl,
         isRead: false
     }
-    console.log(newData);
     let newMessage = await ChatMessage.create(newData);
     return newMessage;
 }

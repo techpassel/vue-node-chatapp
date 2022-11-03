@@ -4,14 +4,19 @@ import Attach from '../assets/images/attach.png';
 import { ref } from 'vue';
 import { useMessageStore } from '@/stores/messageStore';
 import { storeToRefs } from 'pinia';
-import { sendMessageInGroup } from '../services/chat.service'
+import { sendMessageInGroup } from '../services/chatHelper.service'
 
-const msg = ref('');
+const msg = ref<string>('');
+const isSending = ref<boolean>(false);
 const messageStore = useMessageStore();
 const { currentRoomInfo } = storeToRefs(messageStore);
 
 const sendMsg = () => {
-    if (currentRoomInfo.value?.id) sendMessageInGroup(msg.value, currentRoomInfo.value?.id);
+    isSending.value = true;
+    if (currentRoomInfo.value?.id) sendMessageInGroup(msg.value, currentRoomInfo.value?.id, () => {
+        msg.value = ''
+        isSending.value = false;
+    });
 }
 
 </script>
@@ -25,7 +30,7 @@ const sendMsg = () => {
             <label for="upload">
                 <img :src="Img" alt="">
             </label>
-            <button type="submit">Send</button>
+            <button type="submit" :disabled="isSending">{{ isSending ? 'Sending...' : 'Send' }}</button>
         </div>
     </form>
 </template>

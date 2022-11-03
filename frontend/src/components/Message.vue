@@ -4,6 +4,7 @@ import type { PropType } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { useMessageStore } from '@/stores/messageStore';
 import { storeToRefs } from 'pinia';
+import { dateInFormat } from '../utils/commonUtil';
 
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
@@ -60,10 +61,10 @@ const getMsgUserImage = () => {
                 Explicabo, fuga!</p>
         </div>
     </div> -->
-    <div :class="data?.userId == user?.id ? 'message owner' : 'message'">
+    <div :class="data?.userId == user?.id ? 'message owner' : 'message'" v-if="data">
         <div class="messageInfo">
             <img :src="serverUrl + '/image/' + getMsgUserImage()" alt="">
-            <span>{{ data?.createdAt }}</span>
+            <span>{{ dateInFormat(data.createdAt) }}</span>
         </div>
         <div class="messageContent">
             <p>{{ data?.message }}</p>
