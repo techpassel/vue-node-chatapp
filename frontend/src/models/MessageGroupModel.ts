@@ -18,6 +18,4 @@ interface MessageGroup {
     users: Array<MessageGroupUser>
 }
 
-
-
 export default MessageGroup;

@@ -1,20 +1,33 @@
 <script setup lang="ts">
-import Img from '../assets/images/img.png'
-import Attach from '../assets/images/attach.png'
+import Img from '../assets/images/img.png';
+import Attach from '../assets/images/attach.png';
+import { ref } from 'vue';
+import { useMessageStore } from '@/stores/messageStore';
+import { storeToRefs } from 'pinia';
+import { sendMessageInGroup } from '../services/chat.service'
+
+const msg = ref('');
+const messageStore = useMessageStore();
+const { currentRoomInfo } = storeToRefs(messageStore);
+
+const sendMsg = () => {
+    if (currentRoomInfo.value?.id) sendMessageInGroup(msg.value, currentRoomInfo.value?.id);
+}
+
 </script>
 
 <template>
-    <div class="input">
-        <input type="text" placeholder="Type something...">
+    <form class="input" @submit.prevent="sendMsg">
+        <input type="text" v-model="msg" placeholder="Type something...">
         <div class="send">
             <img :src="Attach" alt="">
             <input type="file" id="upload">
             <label for="upload">
                 <img :src="Img" alt="">
             </label>
-            <button>Send</button>
+            <button type="submit">Send</button>
         </div>
-    </div>
+    </form>
 </template>
 
 <style lang="scss" scoped>

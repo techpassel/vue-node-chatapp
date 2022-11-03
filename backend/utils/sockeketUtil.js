@@ -1,6 +1,6 @@
 import { createAdapter } from "@socket.io/redis-adapter";
 import { getRedisClient } from "../configs/redisConnection.js";
-import { userJoined, userLeft } from "../services/chatService.js";
+import { saveGroupMessage, userJoined, userLeft } from "../services/chatService.js";
 import { verifyToken } from '../utils/tokenUtil.js';
 
 const listenSocketIo = async (io) => {
@@ -91,19 +91,18 @@ const listenSocketIo = async (io) => {
             })
         })
 
-        socket.on("group message", ({ message, roomId }, callback) => {
-            // Data to send to receivers
-            const outgoingMessage = {
-                user: socket.user,
-                room: roomId,
-                message,
-            };
+        socket.on("group message", async ({ message, roomId }, callback) => {
+            let data = {
+                groupId: roomId,
+                message: message,
+                userId: socket.user.id
+            }
+            
+            let msg = await saveGroupMessage(data);
 
             // To send to all users in room except the sender
-            socket.to(roomId).emit(`message`, outgoingMessage);
-            callback({
-                status: "ok"
-            });
+            socket.to(roomId).emit(`message`, msg);
+            callback(msg);
         });
 
         socket.on("delete group message", ({ messageId, roomId }, callback) => {

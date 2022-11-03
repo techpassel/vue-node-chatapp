@@ -175,6 +175,10 @@
                         }
                     }
                 }
+
+                .activeChat {
+                    background-color: #24004f;
+                }
             }
 
             .logoutBtn {
@@ -241,6 +245,12 @@
                 padding: 10px;
                 height: calc(100% - 150px);
                 overflow-y: auto;
+
+                .emptyGroupMessage {
+                    margin: 10px;
+                    color: #636059;
+                    text-align: center;
+                }
 
                 .message {
                     display: flex;

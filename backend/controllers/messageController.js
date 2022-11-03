@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import ChatGroup from "../models/chatGroupModel.js";
 import User from "../models/userModel.js";
 import mongoose from 'mongoose';
+import ChatMessage from '../models/chatMessageModel.js';
 
 const createMessageGroup = asyncHandler(async (req, res) => {
     const { groupName, isMultiUserGroup, groupImage, users } = req.body;
@@ -203,7 +204,8 @@ const getUsersMessageGroups = asyncHandler(async (req, res) => {
             $match: {
                 users: {
                     $elemMatch: {
-                        //The $elemMatch operator matches documents that contain an array field with at least one element that matches all the specified query criteria.
+                        //The $elemMatch operator matches documents that contain an array field with at least 
+                        //one element that matches all the specified query criteria.
                         userId: mongoose.Types.ObjectId(userId)
                     }
                 }
@@ -271,6 +273,12 @@ const updateMessageGroupImage = asyncHandler(async (req, res) => {
     const updatedGroup = await ChatGroup.findOneAndUpdate({ _id: groupId }, { $set: { groupImageUrl: imageUrl } }, { new: true })
 })
 
+const getMessageGroupMessages = asyncHandler(async (req, res) => {
+    const groupId = req.params.groupId;
+    const groupMessages = await ChatMessage.find({ groupId: groupId });
+    res.status(200).json(groupMessages);
+})
+
 export {
     createMessageGroup,
     addUserInMessageGroup,
@@ -281,5 +289,6 @@ export {
     getMessageGroupDetails,
     getUsersMessageGroups,
     updateMessageGroupName,
-    updateMessageGroupImage
+    updateMessageGroupImage,
+    getMessageGroupMessages
 }

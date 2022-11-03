@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import Message from "./Message.vue";
+import { useMessageStore } from "@/stores/messageStore";
+import { storeToRefs } from "pinia";
 
+const messageStore = useMessageStore();
+const { messages } = storeToRefs(messageStore);
 </script>
 
 <template>
     <div class="messages">
-        <Message />
-        <Message />
-        <Message />
-        <Message />
-        <Message />
-        <Message />
-        <Message />
-        <Message />
-        <Message />
+        <div v-if="messages.length > 0">
+            <Message v-for="message of messages" :data="message" />
+        </div>
+        <div v-else>
+            <div class="emptyGroupMessage">No messages yet.</div>
+        </div>
     </div>
 </template>
 

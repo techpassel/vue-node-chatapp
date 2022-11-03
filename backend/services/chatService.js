@@ -1,4 +1,5 @@
 import { getRedisClient } from "../configs/redisConnection.js"
+import ChatMessage from '../models/chatMessageModel.js'
 
 let redisClient = null;
 
@@ -12,7 +13,7 @@ const userJoined = async (userId, socketId) => {
     if (!user) {
         data = {
             socketIds: [socketId],
-            activeFriends: [],          //Will replace it later
+            activeFriends: [],
             activeVideoChatGroup: null,
         }
     } else {
@@ -38,8 +39,24 @@ const userLeft = async (userId, socketId) => {
     return userData;
 }
 
+const saveGroupMessage = async (data) => {
+    let newData = {
+        groupId: data.groupId,
+        message: data.message,
+        userId: data.userId,
+        // imageUrl: data.imageUrl,
+        // videoUrl: data.videoUrl,
+        // fileUrl: data.fileUrl,
+        isRead: false
+    }
+    console.log(newData);
+    let newMessage = await ChatMessage.create(newData);
+    return newMessage;
+}
+
 export {
     setRedisClient,
     userJoined,
-    userLeft
+    userLeft,
+    saveGroupMessage
 }

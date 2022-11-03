@@ -1,10 +1,11 @@
 import type MessageGroup from '@/models/MessageGroupModel';
-import SocketioService from '@/services/socketio.service'
+import type Message from '@/models/MessageModel';
+import SocketioService from '@/services/socketio.service';
 
 const joinChatGroups = (groups: MessageGroup[]) => {
     groups.forEach(g => {
         SocketioService.joinGroup(g._id, (res: any) => {
-            console.log(res);
+            // console.log(res);
         });
     })
     subscribeToUserRooms();
@@ -19,11 +20,11 @@ const subscribeToUserRooms = () => {
 
     });
 
-    SocketioService.HandleMessageTyping((data: any) => {
+    SocketioService.handleMessageTyping((data: any) => {
 
     });
 
-    SocketioService.HandleMessageTypingEnd((data: any) => {
+    SocketioService.handleMessageTypingEnd((data: any) => {
 
     });
 
@@ -36,10 +37,13 @@ const subscribeToUserRooms = () => {
     });
 }
 
-const abc = (data: any) => {
-    console.log(data);
+const sendMessageInGroup = (message: string, roomId: string) => {
+    SocketioService.sendMessageInGroup({ message, roomId }, (msg: Message) => {
+        // console.log(msg);
+    });
 }
 
 export {
-    joinChatGroups
+    joinChatGroups,
+    sendMessageInGroup
 }

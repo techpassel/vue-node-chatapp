@@ -92,15 +92,15 @@ class SocketioService {
     }
 
     // Handle other user in the group is typing event
-    HandleMessageTyping = (cb: any) => {
+    handleMessageTyping = (cb: any) => {
         if (this.socket) this.socket.emit(`user typing`, cb);
     }
 
     // Handle other user in the group is typing event
-    HandleMessageTypingEnd = (cb: any) => {
+    handleMessageTypingEnd = (cb: any) => {
         if (this.socket) this.socket.emit(`user typing end`, cb);
     }
-
+    /*
     // To send message to self(No practical use currently - just for demo)
     sendMessageToSelf = (message: string, cb: any) => {
         if (this.socket) this.socket.emit("self-message", message, cb)
@@ -115,6 +115,7 @@ class SocketioService {
     sendMessageToAll = (message: string, cb: any) => {
         if (this.socket) this.socket.emit("all-users-message", message, cb)
     }
+    
 
     // Handle self message recieve event
     subscribeToSelfMessages = (cb: any) => {
@@ -130,6 +131,7 @@ class SocketioService {
     subscribeToAllUsersMessages = (cb: any) => {
         if (this.socket) this.socket.on('for all', cb);
     }
+    */
 
     // To send message in group
     sendMessageInGroup = ({ message, roomId }: any, cb: any) => {
