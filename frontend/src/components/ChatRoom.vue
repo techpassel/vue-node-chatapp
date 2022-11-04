@@ -21,7 +21,7 @@ const { currentRoomInfo } = storeToRefs(messageStore);
         <div class="userChatInfo">
             <span class="roomName">{{ data?.name }}</span>
             <span class="msg">
-                {{ data?.latestMsg && data?.latestMsg != '' ? data?.latestMsg : 'No message yet.' }}
+                {{ data?.lastMessage && data?.lastMessage?.message != '' ? data?.lastMessage.message : 'No message yet.' }}
             </span>
         </div>
     </div>

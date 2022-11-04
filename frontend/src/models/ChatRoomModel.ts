@@ -1,3 +1,5 @@
+import type Message from "./MessageModel";
+
 interface ChatUser {
     id: string;
     name: string;
@@ -9,7 +11,7 @@ class ChatRoom {
     name: string;
     isMultiUserGroup: boolean;
     imageUrl: string;
-    latestMsg: string;
+    lastMessage: Message | null;
     users: Array<ChatUser>;
 
     constructor() {
@@ -17,7 +19,7 @@ class ChatRoom {
         this.name = '';
         this.isMultiUserGroup = false;
         this.imageUrl = '';
-        this.latestMsg = '';
+        this.lastMessage = null;
         this.users = []
     }
 }

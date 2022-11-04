@@ -1,3 +1,5 @@
+import type Message from "./MessageModel";
+
 interface MessageGroupUser {
     _id: string;
     userId: string;
@@ -14,7 +16,7 @@ interface MessageGroup {
     groupName: string;
     isMultiUserGroup: boolean;
     groupImageUrl: string;
-    lastMsg: string;
+    lastMessage: Message;
     users: Array<MessageGroupUser>
 }
 

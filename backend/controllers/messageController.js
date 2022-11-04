@@ -219,6 +219,17 @@ const getUsersMessageGroups = asyncHandler(async (req, res) => {
                 as: 'lastMessage'
             }
         },
+        {$unwind: '$lastMessage'},
+        {
+            $group: {
+                _id: "$_id",
+                groupName: { $first: '$groupName' },
+                isMultiUserGroup: { $first: '$isMultiUserGroup' },
+                groupImageUrl: { $first: '$groupImageUrl' },
+                users: {$first: "$users"},
+                lastMessage: {$max: "$lastMessage"}
+            }
+        },
         { $unwind: '$users' },
         {
             $lookup: {

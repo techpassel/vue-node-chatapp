@@ -22,14 +22,16 @@ export const useMessageStore = defineStore('message', () => {
                     'Authorization': `Bearer ${user.value?.token}`
                 }
             });
-            console.log(res.data);
+            // console.log(res.data);
             
-            // if (res.data?.length > 0) {
-            //     messageGroups.value = res.data;
-            //     currentRoomId.value = res.data[0]._id;
-            //     getMessageGroupMessages(res.data[0]._id);
-            //     joinChatGroups(res.data);
-            // }
+            if (res.data?.length > 0) {
+                messageGroups.value = res.data;
+                currentRoomId.value = res.data[0]._id;
+                getMessageGroupMessages(res.data[0]._id);
+                joinChatGroups(res.data);
+            }
+            console.log(messageGroups.value);
+            
         } catch (err: any) {
             if (err.response) {
                 throw new Error(err.response.data.message);
@@ -44,7 +46,7 @@ export const useMessageStore = defineStore('message', () => {
             let data = new ChatRoom();
             data.id = group._id;
             data.isMultiUserGroup = group.isMultiUserGroup;
-            data.latestMsg = group.lastMsg ? group.lastMsg : '';
+            data.lastMessage = group.lastMessage;
             data.users = [];
             if (group.isMultiUserGroup) {
                 data.name = group.groupName;
