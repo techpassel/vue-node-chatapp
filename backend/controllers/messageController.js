@@ -214,22 +214,22 @@ const getUsersMessageGroups = asyncHandler(async (req, res) => {
         {
             $lookup: {
                 from: 'chatmessages',
-                localField: '_id',
-                foreignField: 'groupId',
+                // localField: '_id',
+                // foreignField: 'groupId',
+                "let": { "id": "$_id" },
+                "pipeline": [
+                    {
+                        "$match": {
+                            "$expr": { "$eq": ["$$id", "$groupId"] }
+                        }
+                    },
+                    { "$sort": { "_id": -1 } },
+                    { "$limit": 1 }
+                ],
                 as: 'lastMessage'
             }
         },
-        {$unwind: '$lastMessage'},
-        {
-            $group: {
-                _id: "$_id",
-                groupName: { $first: '$groupName' },
-                isMultiUserGroup: { $first: '$isMultiUserGroup' },
-                groupImageUrl: { $first: '$groupImageUrl' },
-                users: {$first: "$users"},
-                lastMessage: {$max: "$lastMessage"}
-            }
-        },
+        { $unwind: '$lastMessage' },
         { $unwind: '$users' },
         {
             $lookup: {
@@ -265,7 +265,7 @@ const getUsersMessageGroups = asyncHandler(async (req, res) => {
                 isMultiUserGroup: { $first: '$isMultiUserGroup' },
                 groupImageUrl: { $first: '$groupImageUrl' },
                 users: { $push: "$users" },
-                lastMessage: {$first: "$lastMessage"}
+                lastMessage: { $first: "$lastMessage" }
             }
         },
     ])

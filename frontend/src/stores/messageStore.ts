@@ -30,7 +30,7 @@ export const useMessageStore = defineStore('message', () => {
                 getMessageGroupMessages(res.data[0]._id);
                 joinChatGroups(res.data);
             }
-            console.log(messageGroups.value);
+            // console.log(messageGroups.value);
             
         } catch (err: any) {
             if (err.response) {

@@ -10,6 +10,7 @@ export function validName(name: string) {
 }
 
 export const dateInFormat = (date: Date) => {
+    date = new Date(date);
     const time = moment(date).format('LT');
     let additionalInfo = null;
     const today = new Date();
