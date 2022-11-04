@@ -22,12 +22,14 @@ export const useMessageStore = defineStore('message', () => {
                     'Authorization': `Bearer ${user.value?.token}`
                 }
             });
-            if (res.data?.length > 0) {
-                messageGroups.value = res.data;
-                currentRoomId.value = res.data[0]._id;
-                getMessageGroupMessages(res.data[0]._id);
-                joinChatGroups(res.data);
-            }
+            console.log(res.data);
+            
+            // if (res.data?.length > 0) {
+            //     messageGroups.value = res.data;
+            //     currentRoomId.value = res.data[0]._id;
+            //     getMessageGroupMessages(res.data[0]._id);
+            //     joinChatGroups(res.data);
+            // }
         } catch (err: any) {
             if (err.response) {
                 throw new Error(err.response.data.message);
