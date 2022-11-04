@@ -6,6 +6,7 @@ import { validName } from '../utils/commonUtil'
 import { useUserStore } from '../stores/userStore'
 import { storeToRefs } from 'pinia';
 import router from '@/router';
+import { RouterLink } from 'vue-router';
 
 const userStore = useUserStore();
 //For state and Getters(i.e. computed properties we need to use 'storeToRefs'  but not for actions)
@@ -162,7 +163,7 @@ const onSubmit = async () => {
                 <div class="errorMsg" v-if="serverError != ''">{{serverError}}</div>
                 <button>Sign up</button>
             </form>
-            <p>You do have an account? Login</p>
+            <p>You do have an account?<RouterLink class="authPageLink" to="/auth/login">Login</RouterLink></p>
         </div>
     </div>
 </template>

@@ -19,7 +19,9 @@ const sendMessageInGroup = (message: string, roomId: string, cb: any) => {
 const subscribeToUserRooms = () => {
     if (!messageStore) initializeMessageStore();
     socketioService.handleUserJoinedGroup((data: any) => {
-
+        console.log("************************");
+        console.log(data);
+        console.log("************************");
     });
 
     socketioService.handleUserLeftGroup((data: any) => {

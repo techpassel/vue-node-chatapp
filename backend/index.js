@@ -92,10 +92,14 @@ app.get('/test', (req, res) => {
 app.use('/user', userRoutes);
 app.use('/message', messageRoutes);
 app.get("/image/:path(*)", async (req, res) => {
-    let file = await readFile(req.params.path);
-    res.attachment(req.params.path);
-    res.type(file.ContentType);
-    res.send(file.Body);
+    if (req.params.path && req.params.path != "undefined") {
+        let file = await readFile(req.params.path);
+        res.attachment(req.params.path);
+        res.type(file.ContentType);
+        res.send(file.Body);
+    } else {
+        res.status(200);
+    }
 })
 
 app.use(notFound)

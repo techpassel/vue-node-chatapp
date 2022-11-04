@@ -14,8 +14,9 @@ const serverUrl = import.meta.env.VITE_BACKEND_ENDPOINT
             Ennaman Chat
         </div>
         <div class="user">
-            <img :src="serverUrl + '/image/' + user?.imageUrl" alt="Profile image">
-            <span>{{user?.name}}</span>
+            <img :src="serverUrl + '/image/' + user?.imageUrl" alt="Profile image"
+                v-if="user?.imageUrl && user?.imageUrl != ''">
+            <span>{{ user?.name }}</span>
         </div>
     </div>
 </template>

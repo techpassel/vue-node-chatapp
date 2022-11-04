@@ -14,7 +14,7 @@ const { currentRoomId } = storeToRefs(messageStore);
 messageStore.$subscribe((mutation, state) => {
     //To clear text editor in case of room change.If "utation.events.newValue" returns currentRoomId
     //then it means current room is changed. As it return he updated value whatever is changed.
-    //Ignore "red underline" on newValue as it is typescript error.
+    //Ignore "red underline" on newValue as it is useless typescript error.
     if(mutation.events.newValue == currentRoomId.value){
         msg.value = '';
     }
@@ -27,7 +27,6 @@ const sendMsg = () => {
         isSending.value = false;
     });
 }
-
 </script>
 
 <template>

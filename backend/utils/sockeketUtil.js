@@ -27,6 +27,7 @@ const listenSocketIo = async (io) => {
     });
 
     io.on('connection', async (socket, next) => {
+        console.log('User connected', socket.user.name);
 
         //Socket.emit() is used to send message to self while io.emit() is used to send message to others(including self)
         //If you want to send message to all except you then use socket.broadcast.emit()

@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import type User from '@/models/UserModel'
 import Axios from 'axios';
 import router from '@/router';
+import SocketioService from '@/services/socketio.service';
 
 export const useUserStore = defineStore('user', () => {
     const user = ref<User | null>(null);
@@ -18,7 +19,7 @@ export const useUserStore = defineStore('user', () => {
                         'Content-Type': 'multipart/form-data'
                     },
                     /*
-                    //Following code is to monitor the uploded file data in percentage.
+                    //Following code is to monitor the uploded file(image) in percentage.
                     onUploadProgress: function (progressEvent_1: any) {
                         uploadPercentage.value = Math.round((progressEvent_1.loaded / progressEvent_1.total) * 100);
                     }
@@ -26,6 +27,7 @@ export const useUserStore = defineStore('user', () => {
                 }
             );
             user.value = res.data;
+            SocketioService.setupSocketConnection();
             return "Success";
         } catch (err: any) {
             if (err.response) {
@@ -51,6 +53,7 @@ export const useUserStore = defineStore('user', () => {
                 }
             );
             user.value = res.data;
+            SocketioService.setupSocketConnection();
             return "Success";
         } catch (err: any) {
             if (err.response) {
@@ -62,6 +65,7 @@ export const useUserStore = defineStore('user', () => {
     }
 
     const logout = () => {
+        SocketioService.disconnect();
         user.value = null;
         router.push('/auth/login')
     }

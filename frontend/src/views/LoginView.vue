@@ -4,6 +4,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, email, minLength } from '@vuelidate/validators';
 import { useUserStore } from '../stores/userStore';
 import router from '@/router';
+import { RouterLink } from 'vue-router';
 
 const userStore = useUserStore();
 const { login } = userStore;
@@ -67,7 +68,7 @@ const onSubmit = async () => {
                 <div class="errorMsg" v-if="serverError != ''">{{serverError}}</div>
                 <button>Sign in</button>
             </form>
-            <p>You don't have an account? Register</p>
+            <p>You don't have an account?<RouterLink class="authPageLink" to="/auth">Register</RouterLink></p>
         </div>
     </div>
 </template>
