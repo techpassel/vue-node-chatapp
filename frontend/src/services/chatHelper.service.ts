@@ -18,8 +18,6 @@ const sendMessageInGroup = (message: string, roomId: string, cb: any) => {
 
 const subscribeToUserRooms = () => {
     if (!messageStore) initializeMessageStore();
-    console.log("Called");
-
     socketioService.handleUserJoinedGroup((data: any) => {
 
     });
@@ -37,7 +35,6 @@ const subscribeToUserRooms = () => {
     });
 
     socketioService.subscribeToMessages((data: any) => {
-        console.log(data);
         if (data.groupId == messageStore.currentRoomInfo.id) {
             messageStore.addMessage(data);
         }
