@@ -22,6 +22,8 @@ export const useMessageStore = defineStore('message', () => {
                     'Authorization': `Bearer ${user.value?.token}`
                 }
             });
+            // console.log(res.data);
+            
             if (res.data?.length > 0) {
                 messageGroups.value = res.data;
                 currentRoomId.value = res.data[0]._id;

@@ -214,34 +214,55 @@ const getUsersMessageGroups = asyncHandler(async (req, res) => {
         {
             $lookup: {
                 from: 'chatmessages',
-                "let": { "id": "$_id" },
-                "pipeline": [
+                let: { "id": "$_id" },
+                pipeline: [
                     {
                         "$match": {
-                            "$expr": {
-                                // "$eq": ["$$id", "$groupId"]
-                                "$and": [
-                                    { "$eq": ["$$id", "$groupId"] },
-                                    { "$eq": ["$isRead", "false"] }
-                                ]
-                            }
+                            "$expr": { "$eq": ["$$id", "$groupId"] }
                         }
                     },
                     { "$sort": { "_id": -1 } },
+                    { "$limit": 1 }
                 ],
                 as: 'lastMessage'
             }
         },
         { $unwind: '$lastMessage' },
         {
-            $group: {
+            $lookup: {
+                from: 'chatmessages',
+                let: { "id": "$_id" },
+                pipeline: [
+                    {
+                        "$match": {
+                            "$expr": {
+                                "$and": [
+                                    { "$eq": ["$$id", "$groupId"] },
+                                    { "$eq": ["$isRead", "false"] },
+                                    { "$ne": ["$userId", mongoose.Types.ObjectId(userId)] }//6352eb0453ea1d04bfbfee88
+                                ]
+                            }
+                        },
+                    }
+                ],
+                as: 'countMessage'
+            }
+        },
+        {
+            $project: {
                 _id: "$_id",
-                groupName: { $first: '$groupName' },
-                isMultiUserGroup: { $first: '$isMultiUserGroup' },
-                groupImageUrl: { $first: '$groupImageUrl' },
-                users: { $first: "$users" },
-                unreadMessageCount: { $count: {} },
-                lastMessage: { $first: "$lastMessage" }
+                groupName: "$groupName",
+                isMultiUserGroup: "$isMultiUserGroup",
+                groupImageUrl: "$groupImageUrl",
+                users: "$users",
+                lastMessage: "$lastMessage",
+                unreadMessageCount: {
+                    $reduce: {
+                        input: "$countMessage",
+                        initialValue: 0,
+                        in: { $add: ["$$value", 1] }
+                    }
+                }
             }
         },
         { $unwind: '$users' },
