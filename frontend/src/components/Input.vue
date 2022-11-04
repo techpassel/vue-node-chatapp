@@ -9,11 +9,20 @@ import { sendMessageInGroup } from '../services/chatHelper.service'
 const msg = ref<string>('');
 const isSending = ref<boolean>(false);
 const messageStore = useMessageStore();
-const { currentRoomInfo } = storeToRefs(messageStore);
+const { currentRoomId } = storeToRefs(messageStore);
+
+messageStore.$subscribe((mutation, state) => {
+    //To clear text editor in case of room change.If "utation.events.newValue" returns currentRoomId
+    //then it means current room is changed. As it return he updated value whatever is changed.
+    //Ignore "red underline" on newValue as it is typescript error.
+    if(mutation.events.newValue == currentRoomId.value){
+        msg.value = '';
+    }
+})
 
 const sendMsg = () => {
     isSending.value = true;
-    if (currentRoomInfo.value?.id) sendMessageInGroup(msg.value, currentRoomInfo.value?.id, () => {
+    if (currentRoomId.value) sendMessageInGroup(msg.value, currentRoomId.value, () => {
         msg.value = ''
         isSending.value = false;
     });

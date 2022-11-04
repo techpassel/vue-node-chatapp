@@ -102,6 +102,7 @@ export const useMessageStore = defineStore('message', () => {
         messages,
         messageGroups,
         currentRoomInfo,
+        currentRoomId,
         getUsersMessageGroups,
         messageGroupsInFormat,
         setCurrentRoomId,
