@@ -12,6 +12,7 @@ class ChatRoom {
     isMultiUserGroup: boolean;
     imageUrl: string;
     lastMessage: Message | null;
+    unreadMessageCount: number;
     users: Array<ChatUser>;
 
     constructor() {
@@ -20,6 +21,7 @@ class ChatRoom {
         this.isMultiUserGroup = false;
         this.imageUrl = '';
         this.lastMessage = null;
+        this.unreadMessageCount = 0;
         this.users = []
     }
 }

@@ -214,22 +214,36 @@ const getUsersMessageGroups = asyncHandler(async (req, res) => {
         {
             $lookup: {
                 from: 'chatmessages',
-                // localField: '_id',
-                // foreignField: 'groupId',
                 "let": { "id": "$_id" },
                 "pipeline": [
                     {
                         "$match": {
-                            "$expr": { "$eq": ["$$id", "$groupId"] }
+                            "$expr": {
+                                // "$eq": ["$$id", "$groupId"]
+                                "$and": [
+                                    { "$eq": ["$$id", "$groupId"] },
+                                    { "$eq": ["$isRead", "false"] }
+                                ]
+                            }
                         }
                     },
                     { "$sort": { "_id": -1 } },
-                    { "$limit": 1 }
                 ],
                 as: 'lastMessage'
             }
         },
         { $unwind: '$lastMessage' },
+        {
+            $group: {
+                _id: "$_id",
+                groupName: { $first: '$groupName' },
+                isMultiUserGroup: { $first: '$isMultiUserGroup' },
+                groupImageUrl: { $first: '$groupImageUrl' },
+                users: { $first: "$users" },
+                unreadMessageCount: { $count: {} },
+                lastMessage: { $first: "$lastMessage" }
+            }
+        },
         { $unwind: '$users' },
         {
             $lookup: {
@@ -265,7 +279,8 @@ const getUsersMessageGroups = asyncHandler(async (req, res) => {
                 isMultiUserGroup: { $first: '$isMultiUserGroup' },
                 groupImageUrl: { $first: '$groupImageUrl' },
                 users: { $push: "$users" },
-                lastMessage: { $first: "$lastMessage" }
+                lastMessage: { $first: "$lastMessage" },
+                unreadMessageCount: { $first: "$unreadMessageCount" }
             }
         },
     ])
@@ -297,6 +312,12 @@ const getMessageGroupMessages = asyncHandler(async (req, res) => {
     res.status(200).json(groupMessages);
 })
 
+const markMessageAsRead = asyncHandler(async (req, res) => {
+    const tillTime = new Date(req.body.tillTime);
+    await ChatMessage.updateMany({ groupId: req.body.groupId, isRead: false, updatedAt: { "$lt": tillTime }, userId: { "$ne": req.user._id } }, { $set: { isRead: true } });
+    res.status(200).send("ok");
+})
+
 export {
     createMessageGroup,
     addUserInMessageGroup,
@@ -308,5 +329,6 @@ export {
     getUsersMessageGroups,
     updateMessageGroupName,
     updateMessageGroupImage,
-    getMessageGroupMessages
+    getMessageGroupMessages,
+    markMessageAsRead
 }

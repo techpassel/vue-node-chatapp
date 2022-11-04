@@ -17,7 +17,8 @@ interface MessageGroup {
     isMultiUserGroup: boolean;
     groupImageUrl: string;
     lastMessage: Message;
-    users: Array<MessageGroupUser>
+    unreadMessageCount: number;
+    users: Array<MessageGroupUser>;
 }
 
 export default MessageGroup;

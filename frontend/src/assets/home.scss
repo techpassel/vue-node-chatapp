@@ -130,6 +130,7 @@
                     gap: 10px;
                     color: white;
                     cursor: pointer;
+                    position: relative;
 
                     &:hover {
                         background-color: #24004f;
@@ -139,7 +140,7 @@
                         width: 40px;
                         height: 40px;
                         border-radius: 50%;
-                        background-color: #fc0043;
+                        background-color: #636059;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -173,6 +174,16 @@
                             font-size: 14px;
                             color: #e8e3ff;
                         }
+                    }
+
+                    .msgNotification {
+                        font-size: 10px;
+                        padding: 5px;
+                        background-color: #fc0043;
+                        border-radius: 50%;
+                        position: absolute;
+                        top: 5px;
+                        left: 5px;
                     }
                 }
 
@@ -303,7 +314,7 @@
 
                     &.owner {
                         flex-direction: row-reverse;
-                        
+
                         .messageContent {
                             align-items: flex-end;
 

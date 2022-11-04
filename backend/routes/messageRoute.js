@@ -10,7 +10,8 @@ import {
     getUsersMessageGroups,
     updateMessageGroupName,
     updateMessageGroupImage,
-    getMessageGroupMessages
+    getMessageGroupMessages,
+    markMessageAsRead
 } from '../controllers/messageController.js';
 import protect from '../middlewares/authMiddleware.js';
 import upload from '../middlewares/uploadMiddleware.js';
@@ -28,5 +29,6 @@ router.put('/group/remove-user', protect, removeUserFromMessageGroup);
 router.put('/group/make-admin', protect, addUserAdminPrivilege);
 router.put('/group/undo-admin', protect, removeUserAdminPrivilege);
 router.get('/group/messages/:groupId', protect, getMessageGroupMessages)
+router.post('/mark-read', protect, markMessageAsRead)
 
 export default router;

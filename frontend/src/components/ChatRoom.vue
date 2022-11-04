@@ -15,13 +15,15 @@ const { currentRoomInfo } = storeToRefs(messageStore);
 </script>
 
 <template>
-    <div :class="currentRoomInfo?.id == data?.id ? 'userChat activeChat': 'userChat'">
+    <div :class="currentRoomInfo?.id == data?.id ? 'userChat activeChat' : 'userChat'">
         <img :src="serverUrl + '/image/' + data?.imageUrl" alt="" v-if="data?.imageUrl && data?.imageUrl != ''">
         <div class="groupNameIcon" v-else>{{ data?.name.charAt(0) }}</div>
+        <span class="msgNotification" v-if="data?.unreadMessageCount && data?.unreadMessageCount > 0">{{ data?.unreadMessageCount }}</span>
         <div class="userChatInfo">
             <span class="roomName">{{ data?.name }}</span>
             <span class="msg">
-                {{ data?.lastMessage && data?.lastMessage?.message != '' ? data?.lastMessage.message : 'No message yet.' }}
+                {{ data?.lastMessage && data?.lastMessage?.message != '' ? data?.lastMessage.message : 'No message yet.'
+                }}
             </span>
         </div>
     </div>

@@ -22,16 +22,13 @@ export const useMessageStore = defineStore('message', () => {
                     'Authorization': `Bearer ${user.value?.token}`
                 }
             });
-            // console.log(res.data);
-            
             if (res.data?.length > 0) {
                 messageGroups.value = res.data;
                 currentRoomId.value = res.data[0]._id;
                 getMessageGroupMessages(res.data[0]._id);
                 joinChatGroups(res.data);
             }
-            // console.log(messageGroups.value);
-            
+            console.log(messageGroups.value);
         } catch (err: any) {
             if (err.response) {
                 throw new Error(err.response.data.message);
@@ -47,6 +44,7 @@ export const useMessageStore = defineStore('message', () => {
             data.id = group._id;
             data.isMultiUserGroup = group.isMultiUserGroup;
             data.lastMessage = group.lastMessage;
+            data.unreadMessageCount = group.unreadMessageCount;
             data.users = [];
             if (group.isMultiUserGroup) {
                 data.name = group.groupName;
@@ -78,8 +76,39 @@ export const useMessageStore = defineStore('message', () => {
     }
 
     const currentRoomInfo = computed(() => {
+        messageGroups.value = messageGroups.value.map(m => {
+            if (m._id == currentRoomId.value && m.unreadMessageCount > 0) {
+                m.unreadMessageCount = 0;
+                markMessageAsRead(currentRoomId.value);
+            }
+            return m;
+        })
+
         return messageGroupsInFormat.value.find(m => m.id == currentRoomId.value)
     });
+
+    const markMessageAsRead = async (groupId: string) => {
+        try {
+            let res = await Axios.post(`http://localhost:4000/message//mark-read`, 
+            {
+                groupId,
+                tillTime: new Date()
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${user.value?.token}`
+                }
+            });
+            console.log(res.data);
+            
+        } catch (err: any) {
+            if (err.response) {
+                throw new Error(err.response.data.message);
+            } else {
+                throw new Error(err.message);
+            }
+        }
+    }
 
     const getMessageGroupMessages = async (roomId: string) => {
         try {
@@ -111,6 +140,7 @@ export const useMessageStore = defineStore('message', () => {
         messageGroupsInFormat,
         setCurrentRoomId,
         getMessageGroupMessages,
-        addMessage
+        addMessage,
+        markMessageAsRead
     }
 })
