@@ -28,8 +28,8 @@ const subscribeToUserRooms = () => {
     socketioService.handleUserJoinedGroup((data: any) => {
         let tm = new TempMessage();
         tm.action = "UserJoined";
-        tm.userName = data.user.name;
-        tm.userImageUrl = data.user.imageUrl;
+        // tm.userName = data.user.name;
+        // tm.userImageUrl = data.user.imageUrl;
         tm.message = `${data.user.name} is online now.`
         if (data.groupId == messageStore.currentRoomInfo.id) {
             messageStore.addMessage(tm);
@@ -44,8 +44,8 @@ const subscribeToUserRooms = () => {
     socketioService.handleUserLeftGroup((data: any) => {
         let tm = new TempMessage();
         tm.action = "UserLeft";
-        tm.userName = data.user.name;
-        tm.userImageUrl = data.user.imageUrl;
+        // tm.userName = data.user.name;
+        // tm.userImageUrl = data.user.imageUrl;
         tm.message = `${data.user.name} went offline.`
         if (data.groupId == messageStore.currentRoomInfo.id) {
             messageStore.addMessage(tm);

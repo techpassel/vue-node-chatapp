@@ -6,7 +6,7 @@ import ChatRoom from '@/models/ChatRoomModel';
 import type MessageGroup from '@/models/MessageGroupModel';
 import { joinChatGroups } from '@/services/chat.service';
 import type Message from '@/models/MessageModel';
-import type TempMessage from '@/models/TempMessageModel';
+import TempMessage from '@/models/TempMessageModel';
 
 export const useMessageStore = defineStore('message', () => {
     const messageGroups = ref<MessageGroup[]>([]);
@@ -127,8 +127,15 @@ export const useMessageStore = defineStore('message', () => {
                 if (res.data.length > 0)
                     lastMessageCreatedOn.value = new Date(res.data[res.data.length - 1]['createdAt']);
             } else {
-                let newData = res.data.reverse();
-                messages.value = newData.concat(messages.value);
+                if (res.data.length == 0) {
+                    let tm = new TempMessage();
+                    tm.action = "NoMoreMessageInGroup";
+                    tm.message = `No more messages.`
+                    addMessage(tm);
+                } else {
+                    let newData = res.data.reverse();
+                    messages.value = newData.concat(messages.value);
+                }
             }
         } catch (err: any) {
             if (err.response) {
@@ -139,7 +146,7 @@ export const useMessageStore = defineStore('message', () => {
         }
     }
 
-    const addMessage = (data: Message) => {
+    const addMessage = (data: Message | TempMessage) => {
         messages.value = [...messages.value, data]
     }
 
