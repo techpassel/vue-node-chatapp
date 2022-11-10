@@ -28,7 +28,7 @@ router.put('/group/add-user', protect, addUserInMessageGroup);
 router.put('/group/remove-user', protect, removeUserFromMessageGroup);
 router.put('/group/make-admin', protect, addUserAdminPrivilege);
 router.put('/group/undo-admin', protect, removeUserAdminPrivilege);
-router.get('/group/messages/:groupId', protect, getMessageGroupMessages)
+router.get('/group/messages/:groupId/:pageNum/:lastMessageCreatedOn', protect, getMessageGroupMessages)
 router.post('/mark-read', protect, markMessageAsRead)
 
 export default router;

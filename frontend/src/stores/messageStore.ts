@@ -11,6 +11,8 @@ import type TempMessage from '@/models/TempMessageModel';
 export const useMessageStore = defineStore('message', () => {
     const messageGroups = ref<MessageGroup[]>([]);
     const messages = ref<(Message | TempMessage)[]>([]);
+    const messagesPageNum = ref<number>(0);
+    const lastMessageCreatedOn = ref<Date>(new Date());
     const currentRoomId = ref<string>();
     const userStore = useUserStore();
     //For state and Getters(i.e. computed properties we need to use 'storeToRefs' but not for actions)
@@ -27,7 +29,7 @@ export const useMessageStore = defineStore('message', () => {
             if (res.data?.length > 0) {
                 messageGroups.value = res.data;
                 currentRoomId.value = res.data[0]._id;
-                getMessageGroupMessages(res.data[0]._id);
+                getMessageGroupMessages(res.data[0]._id, true);
                 joinChatGroups(res.data);
             }
         } catch (err: any) {
@@ -72,7 +74,7 @@ export const useMessageStore = defineStore('message', () => {
     const setCurrentRoomId = (roomId: string) => {
         if (currentRoomId.value != roomId) {
             currentRoomId.value = roomId;
-            getMessageGroupMessages(roomId);
+            getMessageGroupMessages(roomId, true);
         }
     }
 
@@ -109,14 +111,25 @@ export const useMessageStore = defineStore('message', () => {
         }
     }
 
-    const getMessageGroupMessages = async (roomId: string) => {
+    const getMessageGroupMessages = async (roomId: string, isNewRoom: boolean) => {
         try {
-            let res = await Axios.get(`http://localhost:4000/message/group/messages/${roomId}`, {
+            if (isNewRoom) {
+                messagesPageNum.value = 0;
+                lastMessageCreatedOn.value = new Date();
+            }
+            let res = await Axios.get(`http://localhost:4000/message/group/messages/${roomId}/${messagesPageNum.value}/${lastMessageCreatedOn.value}`, {
                 headers: {
                     'Authorization': `Bearer ${user.value?.token}`
                 }
             });
-            messages.value = res.data;
+            if (isNewRoom) {
+                messages.value = res.data.reverse();
+                if (res.data.length > 0)
+                    lastMessageCreatedOn.value = new Date(res.data[res.data.length - 1]['createdAt']);
+            } else {
+                let newData = res.data.reverse();
+                messages.value = newData.concat(messages.value);
+            }
         } catch (err: any) {
             if (err.response) {
                 throw new Error(err.response.data.message);

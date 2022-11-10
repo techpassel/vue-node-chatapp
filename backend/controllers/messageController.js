@@ -329,7 +329,13 @@ const updateMessageGroupImage = asyncHandler(async (req, res) => {
 
 const getMessageGroupMessages = asyncHandler(async (req, res) => {
     const groupId = req.params.groupId;
-    const groupMessages = await ChatMessage.find({ groupId: groupId });
+    const pageLimit = 10;
+    const pageNum = req.params.pageNum;
+    const lastMessageCreatedOn = req.params.lastMessageCreatedOn;
+    const groupMessages = await ChatMessage.find({ groupId: groupId, createdAt: { $lte: lastMessageCreatedOn } })
+        .limit(pageLimit)
+        .skip(pageLimit * pageNum)
+        .sort({ 'createdAt': "desc" })
     res.status(200).json(groupMessages);
 })
 
