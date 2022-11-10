@@ -13,6 +13,7 @@ export const useMessageStore = defineStore('message', () => {
     const messages = ref<(Message | TempMessage)[]>([]);
     const messagesPageNum = ref<number>(0);
     const lastMessageCreatedOn = ref<Date>(new Date());
+    const isFetchingMessages = ref<boolean>(false);
     const currentRoomId = ref<string>();
     const userStore = useUserStore();
     //For state and Getters(i.e. computed properties we need to use 'storeToRefs' but not for actions)
@@ -113,6 +114,7 @@ export const useMessageStore = defineStore('message', () => {
 
     const getMessageGroupMessages = async (roomId: string, isNewRoom: boolean) => {
         try {
+            isFetchingMessages.value = true
             if (isNewRoom) {
                 messagesPageNum.value = 0;
                 lastMessageCreatedOn.value = new Date();
@@ -137,7 +139,9 @@ export const useMessageStore = defineStore('message', () => {
                     messages.value = newData.concat(messages.value);
                 }
             }
+            isFetchingMessages.value = false
         } catch (err: any) {
+            isFetchingMessages.value = false
             if (err.response) {
                 throw new Error(err.response.data.message);
             } else {
