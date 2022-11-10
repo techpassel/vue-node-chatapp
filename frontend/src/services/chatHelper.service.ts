@@ -1,6 +1,8 @@
 import type Message from "@/models/MessageModel";
 import { useMessageStore } from "@/stores/messageStore";
 import socketioService from "./socketio.service";
+import type MessageGroup from '@/models/MessageGroupModel';
+import TempMessage from "@/models/TempMessageModel";
 
 let messageStore: any = null;
 
@@ -12,6 +14,11 @@ const sendMessageInGroup = (message: string, roomId: string, cb: any) => {
     if (!messageStore) initializeMessageStore();
     socketioService.sendMessageInGroup({ message, roomId }, (data: Message) => {
         messageStore.addMessage(data);
+        messageStore.messageGroups.forEach((mg: MessageGroup) => {
+            if (mg._id == data.groupId) {
+                mg.lastMessage = data;
+            }
+        })
         cb();
     });
 }
@@ -19,13 +26,35 @@ const sendMessageInGroup = (message: string, roomId: string, cb: any) => {
 const subscribeToUserRooms = () => {
     if (!messageStore) initializeMessageStore();
     socketioService.handleUserJoinedGroup((data: any) => {
-        console.log("************************");
-        console.log(data);
-        console.log("************************");
+        let tm = new TempMessage();
+        tm.action = "UserJoined";
+        tm.userName = data.user.name;
+        tm.userImageUrl = data.user.imageUrl;
+        tm.message = `${data.user.name} is online now.`
+        if (data.groupId == messageStore.currentRoomInfo.id) {
+            messageStore.addMessage(tm);
+        }
+        messageStore.messageGroups.forEach((mg: MessageGroup) => {
+            if (mg._id == data.groupId) {
+                mg.lastMessage = tm;
+            }
+        })
     });
 
     socketioService.handleUserLeftGroup((data: any) => {
-
+        let tm = new TempMessage();
+        tm.action = "UserLeft";
+        tm.userName = data.user.name;
+        tm.userImageUrl = data.user.imageUrl;
+        tm.message = `${data.user.name} went offline.`
+        if (data.groupId == messageStore.currentRoomInfo.id) {
+            messageStore.addMessage(tm);
+        }
+        messageStore.messageGroups.forEach((mg: MessageGroup) => {
+            if (mg._id == data.groupId) {
+                mg.lastMessage = tm;
+            }
+        })
     });
 
     socketioService.handleMessageTyping((data: any) => {
@@ -40,8 +69,14 @@ const subscribeToUserRooms = () => {
         if (data.groupId == messageStore.currentRoomInfo.id) {
             messageStore.addMessage(data);
         }
-        //Here we have to write code for updating last message and unread message count of related message-group.
-        //last message will be updated for current group as well as for non-current groups. 
+        messageStore.messageGroups.forEach((mg: MessageGroup) => {
+            if (mg._id == data.groupId) {
+                mg.lastMessage = data;
+                if (data.groupId != messageStore.currentRoomInfo.id) {
+                    mg.unreadMessageCount++;
+                }
+            }
+        })
     });
 
     socketioService.subscribeToDeleteMessages((data: any) => {

@@ -1,4 +1,5 @@
 import type Message from "./MessageModel";
+import type TempMessage from "./TempMessageModel";
 
 interface MessageGroupUser {
     _id: string;
@@ -16,7 +17,7 @@ interface MessageGroup {
     groupName: string;
     isMultiUserGroup: boolean;
     groupImageUrl: string;
-    lastMessage: Message;
+    lastMessage: Message | TempMessage;
     unreadMessageCount: number;
     users: Array<MessageGroupUser>;
 }

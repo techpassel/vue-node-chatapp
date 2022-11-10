@@ -1,4 +1,4 @@
-import { getRedisClient } from "../configs/redisConnection.js"
+import { getRedisClient } from "../configs/redisConnection.js";
 import ChatMessage from '../models/chatMessageModel.js'
 
 let redisClient = null;
@@ -7,36 +7,44 @@ const setRedisClient = async () => {
     redisClient = await getRedisClient();
 }
 
-const userJoined = async (userId, socketId) => {
-    let user = await redisClient.get(userId);
-    let data = null;
-    if (!user) {
-        data = {
-            socketIds: [socketId],
-            activeFriends: [],
-            activeVideoChatGroup: null,
-        }
-    } else {
-        data = JSON.parse(user);
-        data.socketIds.push(socketId);
-    }
-    await redisClient.set(userId, JSON.stringify(data))
+const userJoinedGroup = async (groupId, userId, socketId) => {
+    let res = await redisClient.sAdd(`user-groups-${userId}`, groupId)
+    setUserSocket(userId, socketId)
+    return res;
 }
 
-const userLeft = async (userId, socketId) => {
-    let userData = null;
-    let user = await redisClient.get(userId);
-    if (user) {
-        userData = JSON.parse(user);
-        let remainingSocketIds = userData.socketIds.filter(u => u != socketId)
-        if (remainingSocketIds.length == 0)
-            await redisClient.del(userId)
-        else {
-            userData.socketIds = remainingSocketIds
-            await redisClient.set(userId, JSON.stringify(userData))
-        }
+const setUserSocket = async (userId, socketId) => {
+    let existingSocketId = await redisClient.get(`user-socket-${userId}`);
+    if (!existingSocketId || existingSocketId != socketId)
+        await redisClient.set(`user-socket-${userId}`, socketId);
+}
+
+const userLeftGroup = async (groupId, userId) => {
+    let res = await redisClient.sRem(`user-groups-${userId}`, groupId);
+    deleteUserGroupIfEmpty(userId);
+    return res;
+}
+
+const deleteUserGroupIfEmpty = async (userId) => {
+    let userGroupsLength = await redisClient.sCard(`user-groups-${userId}`);
+    if (userGroupsLength == 0) {
+        await redisClient.del(`user-groups-${userId}`)
     }
-    return userData;
+}
+
+const userDisconnected = async (userId, socketId) => {
+    let existingSocketId = await redisClient.get(`user-socket-${userId}`);
+    let usersGroups = []
+    if (existingSocketId && existingSocketId == socketId) {
+        usersGroups = await redisClient.sMembers(`user-groups-${userId}`);
+        deleteUserSocketAndUserGroup(userId);
+    }
+    return usersGroups;
+}
+
+const deleteUserSocketAndUserGroup = async (userId) => {
+    await redisClient.del(`user-socket-${userId}`)
+    await redisClient.del(`user-groups-${userId}`)
 }
 
 const saveGroupMessage = async (data) => {
@@ -55,7 +63,8 @@ const saveGroupMessage = async (data) => {
 
 export {
     setRedisClient,
-    userJoined,
-    userLeft,
+    userJoinedGroup,
+    userLeftGroup,
+    userDisconnected,
     saveGroupMessage
 }

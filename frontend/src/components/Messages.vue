@@ -13,7 +13,7 @@ let previousScrollTop: number = 0;
 const scrollToBottom = () => {
     let el: any = messageRef.value;
     if (el) {
-        if (previousScrollTop == 0 || (previousScrollTop - el.scrollTop) < 150) {
+        if (previousScrollTop == 0 || (previousScrollTop - el.scrollTop) < 200) {
             el.scrollTop = el.scrollHeight;
             previousScrollTop = el.scrollTop;
         }

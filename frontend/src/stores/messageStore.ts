@@ -6,10 +6,11 @@ import ChatRoom from '@/models/ChatRoomModel';
 import type MessageGroup from '@/models/MessageGroupModel';
 import { joinChatGroups } from '@/services/chat.service';
 import type Message from '@/models/MessageModel';
+import type TempMessage from '@/models/TempMessageModel';
 
 export const useMessageStore = defineStore('message', () => {
     const messageGroups = ref<MessageGroup[]>([]);
-    const messages = ref<Message[]>([]);
+    const messages = ref<(Message | TempMessage)[]>([]);
     const currentRoomId = ref<string>();
     const userStore = useUserStore();
     //For state and Getters(i.e. computed properties we need to use 'storeToRefs' but not for actions)
@@ -22,15 +23,13 @@ export const useMessageStore = defineStore('message', () => {
                     'Authorization': `Bearer ${user.value?.token}`
                 }
             });
-            // console.log(res.data);
-            
+
             if (res.data?.length > 0) {
                 messageGroups.value = res.data;
                 currentRoomId.value = res.data[0]._id;
                 getMessageGroupMessages(res.data[0]._id);
                 joinChatGroups(res.data);
             }
-            console.log(messageGroups.value);
         } catch (err: any) {
             if (err.response) {
                 throw new Error(err.response.data.message);
@@ -91,18 +90,16 @@ export const useMessageStore = defineStore('message', () => {
 
     const markMessageAsRead = async (groupId: string) => {
         try {
-            let res = await Axios.post(`http://localhost:4000/message//mark-read`, 
-            {
-                groupId,
-                tillTime: new Date()
-            },
-            {
-                headers: {
-                    'Authorization': `Bearer ${user.value?.token}`
-                }
-            });
-            console.log(res.data);
-            
+            let res = await Axios.post(`http://localhost:4000/message//mark-read`,
+                {
+                    groupId,
+                    tillTime: new Date()
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${user.value?.token}`
+                    }
+                });
         } catch (err: any) {
             if (err.response) {
                 throw new Error(err.response.data.message);

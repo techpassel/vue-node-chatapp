@@ -1,6 +1,6 @@
 import { createAdapter } from "@socket.io/redis-adapter";
 import { getRedisClient } from "../configs/redisConnection.js";
-import { saveGroupMessage, userJoined, userLeft } from "../services/chatService.js";
+import { saveGroupMessage, userJoinedGroup, userLeftGroup, userDisconnected } from "../services/chatService.js";
 import { verifyToken } from '../utils/tokenUtil.js';
 
 const listenSocketIo = async (io) => {
@@ -34,13 +34,23 @@ const listenSocketIo = async (io) => {
         //And if you want to send message in a room then use socket.to(roomId).emit().
 
         //Will be triggered if a user exits or disconnect.
-        socket.on('disconnect', async () => {
+        socket.on('disconnect', () => {
             console.log('User disconnected', socket.user.name);
+            setTimeout(async () => {
+                let usersGroups = await userDisconnected(socket.user.id, socket.id);
+                usersGroups.forEach(groupId => {
+                    socket.to(groupId).emit(`user left`, { groupId: groupId, user: socket.user })
+                });
+            }, 1000 * 60);
+            //We are waiting for 2 minutes before considering that user left the group. 
+            //As it will be called on page reload or on even tiny network break also.  
         });
 
         socket.on("join", async (roomId, callback) => {
             socket.join(roomId);
-            socket.to(roomId).emit(`user joined`, { room: roomId, user: socket.user })
+            let res = await userJoinedGroup(roomId, socket.user.id, socket.id);
+            if (res != 0)
+                socket.to(roomId).emit(`user joined`, { groupId: roomId, socketId: socket.id, user: socket.user })
             callback({
                 status: "ok"
             })
@@ -48,21 +58,23 @@ const listenSocketIo = async (io) => {
 
         socket.on("leave", async (roomId, callback) => {
             socket.leave(roomId);
-            socket.to(roomId).emit(`user left`, { room: roomId, user: socket.user })
+            let res = userLeftGroup(roomId, socket.user.id, socket.id);
+            if (res != 0)
+                socket.to(roomId).emit(`user left`, { groupId: roomId, user: socket.user })
             callback({
                 status: "ok"
             })
         });
 
         socket.on("me typing", (roomId) => {
-            socket.to(roomId).emit(`user typing`, { room: roomId, user: socket.user })
+            socket.to(roomId).emit(`user typing`, { groupId: roomId, user: socket.user })
             callback({
                 status: "ok"
             })
         })
 
         socket.on("me typing end", (roomId) => {
-            socket.to(roomId).emit(`user typing end`, { room: roomId, user: socket.user })
+            socket.to(roomId).emit(`user typing end`, { groupId: roomId, user: socket.user })
             callback({
                 status: "ok"
             })
@@ -98,7 +110,7 @@ const listenSocketIo = async (io) => {
                 message: message,
                 userId: socket.user.id
             }
-            
+
             let msg = await saveGroupMessage(data);
 
             // To send to all users in room except the sender
@@ -110,7 +122,7 @@ const listenSocketIo = async (io) => {
             // Data to send to receivers
             const outgoingMessage = {
                 user: socket.user,
-                room: roomId,
+                groupId: roomId,
                 messageId: messageId,
             };
 

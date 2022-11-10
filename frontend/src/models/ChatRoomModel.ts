@@ -22,7 +22,7 @@ class ChatRoom {
         this.imageUrl = '';
         this.lastMessage = null;
         this.unreadMessageCount = 0;
-        this.users = []
+        this.users = [];
     }
 }
 

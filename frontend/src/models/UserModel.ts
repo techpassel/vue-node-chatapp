@@ -8,12 +8,12 @@ class User {
 
 
     constructor() {
-        this.id = "",
-        this.name = "",
-        this.email = "",
-        this.isAdmin = false,
-        this.imageUrl = "",
-        this.token = ""
+        this.id = "";
+        this.name = "";
+        this.email = "";
+        this.isAdmin = false;
+        this.imageUrl = "";
+        this.token = "";
     }
 }
 
